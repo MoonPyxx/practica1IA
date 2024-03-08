@@ -45,9 +45,20 @@ Action ComportamientoJugador::think(Sensores sensores)
 		current_state.brujula = static_cast<Orientacion>(a);
 		break;
 	}
+	
+	if (sensores.posF!=-1 && !bien_situado){
+		current_state.fil = sensores.posF;
+		current_state.col = sensores.posC;
+		current_state.brujula = sensores.sentido;
+		bien_situado = true;
+	}
+	if (bien_situado){
+mapaResultado[current_state.fil][current_state.col] = sensores.terreno[0];	}
+
 
 	// Decidir la nueva accion
-	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S') && sensores.agentes[2]=='_'){
+	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
+	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
  		accion = actWALK;
  		} else if (!girar_derecha){
 			accion = actTURN_L;
@@ -95,4 +106,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 int ComportamientoJugador::interact(Action accion, int valor)
 {
 	return false;
+}
+void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz){
+	matriz[st.fil][st.col] = terreno[0];
 }
