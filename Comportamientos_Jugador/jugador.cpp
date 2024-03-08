@@ -22,6 +22,18 @@ Action ComportamientoJugador::think(Sensores sensores)
 		// Actualizacion en caso de avanzar
 		break;
 	case actRUN:
+	switch(current_state.brujula){
+				case norte: current_state.fil-=2; break;
+				case noreste: current_state.fil-=2; current_state.col+=2; break;
+				case este: current_state.col+=2; break;
+				case sureste: current_state.fil+=2; current_state.col+=2; break;
+				case sur: current_state.fil+=2; break;
+				case suroeste: current_state.fil+=2; current_state.col-=2; break;
+				case oeste: current_state.col-=2; break;
+				case noroeste: current_state.fil-=2; current_state.col-=2; break;
+			
+		   }
+		   break;
  		// Actualizacion en caso de correr (45 grados)
 		case actTURN_SR:
 			a = (a+1)%8;
@@ -37,9 +49,14 @@ Action ComportamientoJugador::think(Sensores sensores)
 	// Decidir la nueva accion
 	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S') && sensores.agentes[2]=='_'){
  		accion = actWALK;
- 		} else{
- 		accion = actTURN_L;
- 	}
+ 		} else if (!girar_derecha){
+			accion = actTURN_L;
+			girar_derecha = (rand()%2 == 0);
+
+		} else {
+ 		accion = actTURN_SR;
+		girar_derecha = (rand()%2 == 0);
+		}
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;

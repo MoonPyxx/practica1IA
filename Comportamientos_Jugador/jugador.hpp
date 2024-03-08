@@ -28,6 +28,7 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
 
   private:
+  bool girar_derecha;
   Action last_action;
   Orientacion brujula;
   state current_state;
