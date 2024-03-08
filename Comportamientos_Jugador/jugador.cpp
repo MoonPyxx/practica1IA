@@ -5,25 +5,46 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {
 	int a = current_state.brujula;
+	Action accion = actIDLE;
 	switch(last_action){
 		case actWALK:
+		   switch(current_state.brujula){
+				case norte: current_state.fil--; break;
+				case noreste: current_state.fil--; current_state.col++; break;
+				case este: current_state.col++; break;
+				case sureste: current_state.fil++; current_state.col++; break;
+				case sur: current_state.fil++; break;
+				case suroeste: current_state.fil++; current_state.col--; break;
+				case oeste: current_state.col--; break;
+				case noroeste: current_state.fil--; current_state.col--; break;
+			
+		   }
 		// Actualizacion en caso de avanzar
 		break;
 	case actRUN:
- 		// Actualizacion en caso de correr
+ 		// Actualizacion en caso de correr (45 grados)
 		case actTURN_SR:
 			a = (a+1)%8;
 			current_state.brujula = static_cast<Orientacion>(a);
 			break;
 		case actTURN_L:
 		// Actualizacion de girar 90 a la izquierda
-		a = (a+7)%8;
+		a = (a+6)%8;
 		current_state.brujula = static_cast<Orientacion>(a);
 		break;
 	}
 
-
-	Action accion = actIDLE;
+	// Decidir la nueva accion
+	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S') && sensores.agentes[2]=='_'){
+ 		accion = actWALK;
+ 		} else{
+ 		accion = actTURN_L;
+ 	}
+	// Recordar la ultima accion
+	last_action = accion;
+	return accion;
+	
+	
 
 	// Mostrar el valor de los sensores
 	cout << "Posicion: fila " << sensores.posF << " columna " << sensores.posC;

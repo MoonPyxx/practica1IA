@@ -18,6 +18,7 @@ class ComportamientoJugador : public Comportamiento{
       current_state.brujula = norte;
       current_state.fil = 99;
       current_state.col = 99;
+      last_action = actIDLE;
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
