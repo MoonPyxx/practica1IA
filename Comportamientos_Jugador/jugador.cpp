@@ -53,14 +53,40 @@ Action ComportamientoJugador::think(Sensores sensores)
 		bien_situado = true;
 	}
 	if (bien_situado){
-mapaResultado[current_state.fil][current_state.col] = sensores.terreno[0];	}
+		PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);
+		casillasVisitadas[current_state.fil][current_state.col] = true;
 
+	}
 
+/*if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
+	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
+ 		accion = actWALK;
+	 } else {
+		if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
+	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
+
+	 }
+	 }
 	// Decidir la nueva accion
 	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
 	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
  		accion = actWALK;
- 		} else if (!girar_derecha){
+ 		}
+		
+		*/
+	if (sensores.terreno[2] != 'P' && sensores.terreno[2] != 'M' && sensores.agentes[2] == '_' ) {
+    // Puede continuar hacia adelante
+    accion = actWALK;
+} else {
+    // Necesita tomar una decisión más compleja
+    if (sensores.terreno[4] != 'P' && sensores.terreno[4] != 'M' && sensores.agentes[4] == '_') {
+        // Puede girar a la izquierda
+        accion = actTURN_L;
+    } else if (sensores.terreno[6] != 'P' && sensores.terreno[6] != 'M' && sensores.agentes[6] == '_') {
+        // Puede girar a la derecha
+        accion = actTURN_SR;
+    } else {
+       if (!girar_derecha){
 			accion = actTURN_L;
 			girar_derecha = (rand()%2 == 0);
 
@@ -68,6 +94,9 @@ mapaResultado[current_state.fil][current_state.col] = sensores.terreno[0];	}
  		accion = actTURN_SR;
 		girar_derecha = (rand()%2 == 0);
 		}
+    }
+}
+		 
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
