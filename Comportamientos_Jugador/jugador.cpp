@@ -57,6 +57,10 @@ Action ComportamientoJugador::think(Sensores sensores)
 	}
 
 	// Decidir la nueva accion
+	// toca muro
+	if (sensores.terreno[2]== 'M'){
+		accion = actTURN_L;
+	}
 	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
 	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
  		accion = actWALK;
@@ -110,28 +114,37 @@ int ComportamientoJugador::interact(Action accion, int valor)
 void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz){
 	matriz[st.fil][st.col] = terreno[0];
 
-	if (NSWE()){
-		matriz[st.fil-1][st.col-1] = sensores.terreno[1];
-		matriz[st.fil-1][st.col] = sensores.terreno[2];
-		matriz[st.fil-1][st.col+1] = sensores.terreno[3];
-		matriz[st.fil-2][st.col-2] = sensores.terreno[4];
-		matriz[st.fil-2][st.col-1] = sensores.terreno[5];
-		matriz[st.fil-2][st.col] = sensores.terreno[6];
-		matriz[st.fil-2][st.col+1] = sensores.terreno[7];
-		matriz[st.fil-2][st.col+2] = sensores.terreno[8];
-		matriz[st.fil-3][st.col-3] = sensores.terreno[9];
-		matriz[st.fil-3][st.col-2] = sensores.terreno[10];
-		matriz[st.fil-3][st.col-1] = sensores.terreno[11];
-		matriz[st.fil-3][st.col] = sensores.terreno[12];
-		matriz[st.fil-3][st.col+1] = sensores.terreno[13];
-		matriz[st.fil-3][st.col+2] = sensores.terreno[14];
-		matriz[st.fil-3][st.col+3] = sensores.terreno[15];
+	if (current_state.brujula==norte){
+		cout << current_state.brujula << endl;
+		int index = 1; 
+		for(int i = 1; i <= 3; ++i) { 
+    		for(int j = -i; j <= i; ++j) { 
+        		matriz[st.fil - i][st.col + j] = sensores.terreno[index++];
+    	}
+}
 
+	} else if (current_state.brujula == sur){
+		int index = 1; 
+		for(int i = 1; i <= 3; ++i) { 
+    		for(int j = -i; j <= i; ++j) { 
+        		matriz[st.fil + i][st.col - j] = sensores.terreno[index++];
+    			}
+			}
+	} else if(current_state.brujula==este){
+		int index = 1; 
+		for(int i = 1; i <= 3; ++i) { 
+    		for(int j = -i; j <= i; ++j) { 
+        		matriz[st.fil + j][st.col + i] = sensores.terreno[index++];
 
+    }
+}
+	} else if(current_state.brujula==oeste){
+		int index = 1; 
+		for(int i = 1; i <= 3; ++i) { 
+    		for(int j = -i; j <= i; ++j) {
+       			matriz[st.fil - j][st.col - i] = sensores.terreno[index++];
 
-
-		cout << "nortesuresteoeste" << endl;
-	} else{
-		cout << "no" << endl;
+    }
+}
 	}
 }
