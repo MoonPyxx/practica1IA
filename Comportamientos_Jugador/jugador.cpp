@@ -53,40 +53,14 @@ Action ComportamientoJugador::think(Sensores sensores)
 		bien_situado = true;
 	}
 	if (bien_situado){
-		PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);
-		casillasVisitadas[current_state.fil][current_state.col] = true;
-
+		mapTerreno(sensores, sensores.terreno, current_state, mapaResultado);
 	}
 
-/*if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
-	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
- 		accion = actWALK;
-	 } else {
-		if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
-	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
-
-	 }
-	 }
 	// Decidir la nueva accion
 	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
 	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
  		accion = actWALK;
- 		}
-		
-		*/
-	if (sensores.terreno[2] != 'P' && sensores.terreno[2] != 'M' && sensores.agentes[2] == '_' ) {
-    // Puede continuar hacia adelante
-    accion = actWALK;
-} else {
-    // Necesita tomar una decisión más compleja
-    if (sensores.terreno[4] != 'P' && sensores.terreno[4] != 'M' && sensores.agentes[4] == '_') {
-        // Puede girar a la izquierda
-        accion = actTURN_L;
-    } else if (sensores.terreno[6] != 'P' && sensores.terreno[6] != 'M' && sensores.agentes[6] == '_') {
-        // Puede girar a la derecha
-        accion = actTURN_SR;
-    } else {
-       if (!girar_derecha){
+ 		} else if (!girar_derecha){
 			accion = actTURN_L;
 			girar_derecha = (rand()%2 == 0);
 
@@ -94,9 +68,6 @@ Action ComportamientoJugador::think(Sensores sensores)
  		accion = actTURN_SR;
 		girar_derecha = (rand()%2 == 0);
 		}
-    }
-}
-		 
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
@@ -136,6 +107,31 @@ int ComportamientoJugador::interact(Action accion, int valor)
 {
 	return false;
 }
-void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz){
+void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz){
 	matriz[st.fil][st.col] = terreno[0];
+
+	if (NSWE()){
+		matriz[st.fil-1][st.col-1] = sensores.terreno[1];
+		matriz[st.fil-1][st.col] = sensores.terreno[2];
+		matriz[st.fil-1][st.col+1] = sensores.terreno[3];
+		matriz[st.fil-2][st.col-2] = sensores.terreno[4];
+		matriz[st.fil-2][st.col-1] = sensores.terreno[5];
+		matriz[st.fil-2][st.col] = sensores.terreno[6];
+		matriz[st.fil-2][st.col+1] = sensores.terreno[7];
+		matriz[st.fil-2][st.col+2] = sensores.terreno[8];
+		matriz[st.fil-3][st.col-3] = sensores.terreno[9];
+		matriz[st.fil-3][st.col-2] = sensores.terreno[10];
+		matriz[st.fil-3][st.col-1] = sensores.terreno[11];
+		matriz[st.fil-3][st.col] = sensores.terreno[12];
+		matriz[st.fil-3][st.col+1] = sensores.terreno[13];
+		matriz[st.fil-3][st.col+2] = sensores.terreno[14];
+		matriz[st.fil-3][st.col+3] = sensores.terreno[15];
+
+
+
+
+		cout << "nortesuresteoeste" << endl;
+	} else{
+		cout << "no" << endl;
+	}
 }

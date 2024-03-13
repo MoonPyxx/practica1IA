@@ -20,8 +20,6 @@ class ComportamientoJugador : public Comportamiento{
       current_state.col = 99;
       last_action = actIDLE;
       bien_situado = false;
-      casillasVisitadas = vector<vector<bool>>(size, vector<bool>(size, false));
-
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -29,10 +27,8 @@ class ComportamientoJugador : public Comportamiento{
 
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
-    void PonerTerrenoEnMatriz(const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz);
-
+    void mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz);
   private:
-  vector<vector<bool>> casillasVisitadas;
   bool girar_derecha;
   Action last_action;
   Orientacion brujula;
