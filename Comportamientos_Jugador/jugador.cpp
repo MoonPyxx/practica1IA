@@ -113,38 +113,87 @@ int ComportamientoJugador::interact(Action accion, int valor)
 }
 void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz){
 	matriz[st.fil][st.col] = terreno[0];
-
-	if (current_state.brujula==norte){
+	int index = 1;
+	switch(sensores.sentido){
+		case norte:
 		cout << current_state.brujula << endl;
-		int index = 1; 
+		 index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
         		matriz[st.fil - i][st.col + j] = sensores.terreno[index++];
     	}
-}
+		}
+		break;
 
-	} else if (current_state.brujula == sur){
-		int index = 1; 
+		case sur:
+		 index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
         		matriz[st.fil + i][st.col - j] = sensores.terreno[index++];
     			}
 			}
-	} else if(current_state.brujula==este){
-		int index = 1; 
+		break;
+
+		case este:
+			index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
         		matriz[st.fil + j][st.col + i] = sensores.terreno[index++];
 
-    }
-}
-	} else if(current_state.brujula==oeste){
-		int index = 1; 
+    		}
+		}
+		break;
+
+		case oeste:
+		index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) {
        			matriz[st.fil - j][st.col - i] = sensores.terreno[index++];
 
     }
 }
-	}
+		break;
+		case noreste:
+		int index = 1;
+int n = 3; // Suponiendo que el '3' representa el nivel máximo de expansión en tu patrón.
+
+for(int i = 1; i <= n; ++i) {
+    // Primer bucle: maneja la expansión hacia arriba y a la derecha.
+    for(int j = -i; j <= i; ++j) {
+        matriz[st.fil - i][st.col + j] = sensores.terreno[index++];
+    }
+    // Segundo bucle: maneja la expansión hacia la derecha.
+    if(i < n) { // Para evitar sobreescritura en la última iteración de 'i'.
+        for(int j = 1; j <= i; ++j) {
+            matriz[st.fil - i + j][st.col + i] = sensores.terreno[index++];
+        }
+    }
+}
+
+// Tercer bucle: maneja la última columna hacia abajo, si es necesario.
+// Nota: Este paso se ajusta si necesitas expandirte más allá de la estructura dada.
+for(int i = -n; i <= 0; ++i) {
+    if(-i > 1) { // Ajusta según necesidad para evitar sobreescrituras.
+        matriz[st.fil + i][st.col + n] = sensores.terreno[index++];
+    }
+}
+
+	/*1 = matriz[-1][0]
+	2 = matriz [-1][+1]
+	3 = matriz [0][+1]
+	4 = matriz [-2][0]
+	5 = matriz [-2][+1]
+	6 = matriz [-2][+2]
+	7 = matriz [-1][+2]
+	8 = matriz [0][+2]
+	9 = matriz [-3][0]
+	10 = matriz [-3][+1]
+	11 = matriz [-3][+2]
+	12 = matriz [-3][+3]
+	13 = matriz [-2][+3]
+	14 = matriz [-1][+3]
+	15 = matriz [0][+3]
+	*/
+
+}
 }
