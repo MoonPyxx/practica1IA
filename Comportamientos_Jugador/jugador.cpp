@@ -17,7 +17,6 @@ Action ComportamientoJugador::think(Sensores sensores)
 				case suroeste: current_state.fil++; current_state.col--; break;
 				case oeste: current_state.col--; break;
 				case noroeste: current_state.fil--; current_state.col--; break;
-			
 		   }
 		// Actualizacion en caso de avanzar
 		break;
@@ -55,14 +54,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 	if (bien_situado){
 		mapTerreno(sensores, sensores.terreno, current_state, mapaResultado);
 	}
-
-	// Decidir la nueva accion
-	// toca muro
-	if (sensores.terreno[2]== 'M'){
-		accion = actTURN_L;
-	}
 	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S'
-	 || sensores.terreno[2]=='G') && sensores.agentes[2] == '_'){
+	 || sensores.terreno[2]=='G' || sensores.terreno[2] == 'A') && sensores.agentes[2] == '_'){
  		accion = actWALK;
  		} else if (!girar_derecha){
 			accion = actTURN_L;
