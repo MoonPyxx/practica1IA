@@ -7,6 +7,8 @@ struct state{
   int fil;
   int col;
   Orientacion brujula;
+  bool tiene_bikini;
+  bool tiene_zapatillas;
 };
 
 class ComportamientoJugador : public Comportamiento{
@@ -27,7 +29,13 @@ class ComportamientoJugador : public Comportamiento{
 
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
-    void mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, const state &st, vector < vector < unsigned char > > &matriz);
+    bool canWalk(Sensores &sensores);
+    bool hayObstaculo(Sensores &sensores);
+    bool esTransitable(char terreno);
+    bool detectarObjeto(Sensores &sensores);
+    bool dentroMapa();
+    void movimiento(Action accion);
+    void mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
   private:
   bool girar_derecha;
   Action last_action;
