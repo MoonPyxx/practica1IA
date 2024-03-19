@@ -20,10 +20,12 @@ class ComportamientoJugador : public Comportamiento{
       current_state.brujula = norte;
       current_state.fil = 99;
       current_state.col = 99;
+      current_state.tiene_bikini = false;
+      current_state.tiene_zapatillas = false;
       last_action = actIDLE;
       bien_situado = false;
       // tam_mapa = size/2;
-      mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
+    //  mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
 
     }
 

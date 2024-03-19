@@ -5,13 +5,16 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
+
+	// debug
 	if (current_state.tiene_bikini){
 		cout << "Tiene bikini" << endl;
 	} else if(current_state.tiene_zapatillas){
 		cout << "Tiene zapatillas" << endl;
-	
 	} 
-	cout << "Terreno frente: " << sensores.terreno[2] << endl;
+
+
+
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	if (sensores.terreno[0] == 'G'){
@@ -47,7 +50,6 @@ Action ComportamientoJugador::think(Sensores sensores)
 		}
 		
 	}
-
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
@@ -70,7 +72,6 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	last_action = actIDLE;
 }
 
-
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
@@ -80,14 +81,13 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 bool ComportamientoJugador::canWalk(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
-    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G' || terreno_frente == 'A' || terreno_frente == 'B');
-
-	/* if (terreno_frente == 'A' && current_state.tiene_bikini) {
+    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G');
+	 if (terreno_frente == 'A' && current_state.tiene_bikini) {
         esTransitable = true;
     } else if (terreno_frente == 'B' && current_state.tiene_zapatillas) {
         esTransitable = true;
     }
-	*/
+	
 
     return esTransitable && sensores.agentes[2] == '_';
 
