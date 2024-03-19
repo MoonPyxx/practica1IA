@@ -5,7 +5,13 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	cout << tam_mapa << endl;
+	if (current_state.tiene_bikini){
+		cout << "Tiene bikini" << endl;
+	} else if(current_state.tiene_zapatillas){
+		cout << "Tiene zapatillas" << endl;
+	
+	} 
+	cout << "Terreno frente: " << sensores.terreno[2] << endl;
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	if (sensores.terreno[0] == 'G'){
@@ -16,10 +22,16 @@ Action ComportamientoJugador::think(Sensores sensores)
 	}
 	if (!bien_situado){
 		if (hayObstaculo(sensores)){
-			accion = actTURN_L;
-		} else {
+			if (rand()%2 == 0){
+				accion = actTURN_L;
+			} else {
+				accion = actTURN_SR;
+			}
+		} else{
+
 			accion = actWALK;
 		}
+			
 	} else{
 		mapTerreno(sensores.terreno, mapaResultado);
 			// Comprobar que está dentro de mapa y que puede andar
@@ -52,9 +64,7 @@ int ComportamientoJugador::interact(Action accion, int valor)
 
 void ComportamientoJugador::reinicio(Sensores &sensores){
 
-//	 current_state.fil = tam_mapa-1;
-	 
-	// current_state.col = tam_mapa-1;
+	// current_state.fil =  current_state.col = 1;
 	current_state.brujula = norte;
 	bien_situado = false;
 	last_action = actIDLE;
@@ -67,21 +77,17 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	return (terreno_frente == 'M' || terreno_frente == 'P');
 }
 
-// Comprobar si delante es transitable
-bool ComportamientoJugador::esTransitable(char terreno) {
-    return terreno == 'T' || terreno == 'S' || terreno == 'G';
-}
-
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 bool ComportamientoJugador::canWalk(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
-    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G');
+    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G' || terreno_frente == 'A' || terreno_frente == 'B');
 
-	if (terreno_frente == 'A' && current_state.tiene_bikini) {
+	/* if (terreno_frente == 'A' && current_state.tiene_bikini) {
         esTransitable = true;
     } else if (terreno_frente == 'B' && current_state.tiene_zapatillas) {
         esTransitable = true;
     }
+	*/
 
     return esTransitable && sensores.agentes[2] == '_';
 

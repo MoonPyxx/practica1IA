@@ -22,7 +22,7 @@ class ComportamientoJugador : public Comportamiento{
       current_state.col = 99;
       last_action = actIDLE;
       bien_situado = false;
-      tam_mapa = size;
+      // tam_mapa = size/2;
       mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
 
     }
@@ -34,7 +34,6 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
     bool canWalk(Sensores &sensores);
     bool hayObstaculo(Sensores &sensores);
-    bool esTransitable(char terreno);
     bool detectarObjeto(Sensores &sensores);
     bool dentroMapa();
     void movimiento(Action accion);
