@@ -22,6 +22,8 @@ class ComportamientoJugador : public Comportamiento{
       current_state.col = 99;
       last_action = actIDLE;
       bien_situado = false;
+      mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
+
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -36,12 +38,16 @@ class ComportamientoJugador : public Comportamiento{
     bool dentroMapa();
     void movimiento(Action accion);
     void mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
+    void reinicio(Sensores &sensores);
   private:
   bool girar_derecha;
   Action last_action;
   Orientacion brujula;
   state current_state;
   bool bien_situado;
+
+  vector<vector<unsigned char>> mapaAuxiliar;
+
 
   // Declarar aquí las variables de estado
 };

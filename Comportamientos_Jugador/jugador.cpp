@@ -41,8 +41,56 @@ int ComportamientoJugador::interact(Action accion, int valor)
 
 // Funciones mias
 
-// Calcular movimiento (actWALK, actRUN)
+// Reiniciar
 
+void ComportamientoJugador::reinicio(Sensores &sensores){
+	current_state.fil = 99;
+	current_state.col = 99;
+	current_state.brujula = norte;
+	bien_situado = false;
+	last_action = actIDLE;
+}
+
+
+// Comprobar si delante hay un obstaculo (muro o precipicio)
+bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
+	char terreno_frente = sensores.terreno[2];
+	return (terreno_frente == 'M' || terreno_frente == 'P');
+}
+
+// Comprobar si delante es transitable
+bool ComportamientoJugador::esTransitable(char terreno) {
+    return terreno == 'T' || terreno == 'S' || terreno == 'G';
+}
+
+// Comprobar si delante es transitable o tienes bikini/zapatillas
+bool ComportamientoJugador::canWalk(Sensores &sensores){
+	char terreno_frente = sensores.terreno[2];
+    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G');
+
+	if (terreno_frente == 'A' && current_state.tiene_bikini) {
+        esTransitable = true;
+    } else if (terreno_frente == 'B' && current_state.tiene_zapatillas) {
+        esTransitable = true;
+    }
+
+    return esTransitable && sensores.agentes[2] == '_';
+
+}
+
+// Detectar si hay un objeto (bikini, zapatillas o recarga)
+bool ComportamientoJugador::detectarObjeto(Sensores &sensores){
+	return (sensores.terreno[2] == 'D' || sensores.terreno[2] == 'X' || sensores.terreno[2] == 'K');
+}
+
+// Comprobar si está dentro del mapa para evitar segmentation error
+
+bool ComportamientoJugador::dentroMapa(){
+	return (current_state.fil >= 0 && current_state.fil < mapaResultado.size() &&
+    current_state.col >= 0 && current_state.col < mapaResultado[0].size());
+}
+
+// Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion){
 	int a = current_state.brujula;
 	switch(last_action){
@@ -81,43 +129,6 @@ void ComportamientoJugador::movimiento(Action accion){
 		current_state.brujula = static_cast<Orientacion>(a);
 		break;
 	}
-}
-// Comprobar si delante hay un obstaculo (muro o precipicio)
-bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
-	char terreno_frente = sensores.terreno[2];
-	return (terreno_frente == 'M' || terreno_frente == 'P');
-}
-
-// Comprobar si delante es transitable
-bool ComportamientoJugador::esTransitable(char terreno) {
-    return terreno == 'T' || terreno == 'S' || terreno == 'G';
-}
-
-// Comprobar si delante es transitable o tienes bikini/zapatillas
-bool ComportamientoJugador::canWalk(Sensores &sensores){
-	char terreno_frente = sensores.terreno[2];
-    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G');
-
-	if (terreno_frente == 'A' && current_state.tiene_bikini) {
-        esTransitable = true;
-    } else if (terreno_frente == 'B' && current_state.tiene_zapatillas) {
-        esTransitable = true;
-    }
-
-    return esTransitable && sensores.agentes[2] == '_';
-
-}
-
-// Detectar si hay un objeto (bikini, zapatillas o recarga)
-bool ComportamientoJugador::detectarObjeto(Sensores &sensores){
-	return (sensores.terreno[2] == 'D' || sensores.terreno[2] == 'X' || sensores.terreno[2] == 'K');
-}
-
-// Comprobar si está dentro del mapa para evitar segmentation error
-
-bool ComportamientoJugador::dentroMapa(){
-	return (current_state.fil >= 0 && current_state.fil < mapaResultado.size() &&
-    current_state.col >= 0 && current_state.col < mapaResultado[0].size());
 }
 // Mapear el terreno en maparesultado (a medias)
 void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){
