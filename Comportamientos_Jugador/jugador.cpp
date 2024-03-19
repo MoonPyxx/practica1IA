@@ -5,19 +5,24 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
+	cout << tam_mapa << endl;
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
-	if (sensores.posF!=-1 && !bien_situado){
+	if (sensores.terreno[0] == 'G'){
 		current_state.fil = sensores.posF;
 		current_state.col = sensores.posC;
 		current_state.brujula = sensores.sentido;
 		bien_situado = true;
 	}
-	// Mapear el terreno
-	if (bien_situado){
-		mapTerreno(sensores, sensores.terreno, mapaResultado);
-	}
-	// Comprobar que está dentro de mapa y que puede andar
+	if (!bien_situado){
+		if (hayObstaculo(sensores)){
+			accion = actTURN_L;
+		} else {
+			accion = actWALK;
+		}
+	} else{
+		mapTerreno(sensores.terreno, mapaResultado);
+			// Comprobar que está dentro de mapa y que puede andar
 	if (canWalk(sensores) && dentroMapa()){
  		accion = actWALK;
  		} else if (!girar_derecha){
@@ -29,6 +34,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 		girar_derecha = (rand()%2 == 0);
 		}
 		
+	}
+
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
@@ -44,8 +51,10 @@ int ComportamientoJugador::interact(Action accion, int valor)
 // Reiniciar
 
 void ComportamientoJugador::reinicio(Sensores &sensores){
-	current_state.fil = 99;
-	current_state.col = 99;
+
+//	 current_state.fil = tam_mapa-1;
+	 
+	// current_state.col = tam_mapa-1;
 	current_state.brujula = norte;
 	bien_situado = false;
 	last_action = actIDLE;
@@ -131,15 +140,15 @@ void ComportamientoJugador::movimiento(Action accion){
 	}
 }
 // Mapear el terreno en maparesultado (a medias)
-void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){
+void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){
 	matriz[current_state.fil][current_state.col] = terreno[0];
 	int index = 1;
-	switch(sensores.sentido){
+	switch(current_state.brujula){
 		case norte:
 		 index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
-        		matriz[current_state.fil - i][current_state.col + j] = sensores.terreno[index++];
+        		matriz[current_state.fil - i][current_state.col + j] = terreno[index++];
     	}
 		}
 		break;
@@ -149,11 +158,11 @@ void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 9 || index == 11 || index == 12 || index == 13){
-					if (sensores.terreno[index != '?']){
-						matriz[current_state.fil + i][current_state.col - j] = sensores.terreno[index++];
+					if (terreno[index != '?']){
+						matriz[current_state.fil + i][current_state.col - j] = terreno[index++];
 					}
 				 } else {
-						matriz[current_state.fil + i][current_state.col - j] = sensores.terreno[index++];
+						matriz[current_state.fil + i][current_state.col - j] = terreno[index++];
 		 			}
     			}
 			}
@@ -164,11 +173,11 @@ void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned
 			for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 9 || index == 11 || index == 12 || index == 13){
-					if (sensores.terreno[index != '?']){
-						matriz[current_state.fil + j][current_state.col + i] = sensores.terreno[index++];
+					if (terreno[index != '?']){
+						matriz[current_state.fil + j][current_state.col + i] = terreno[index++];
 					}
 				 } else {
-						matriz[current_state.fil + j][current_state.col + i] = sensores.terreno[index++];
+						matriz[current_state.fil + j][current_state.col + i] = terreno[index++];
 		 			}
     			}
 			}
@@ -179,119 +188,119 @@ void ComportamientoJugador::mapTerreno(Sensores &sensores, const vector<unsigned
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 9 || index == 11 || index == 12 || index == 13){
-					if (sensores.terreno[index != '?']){
-						matriz[current_state.fil - j][current_state.col - i] = sensores.terreno[index++];
+					if (terreno[index != '?']){
+						matriz[current_state.fil - j][current_state.col - i] = terreno[index++];
 					}
 				 } else {
-						matriz[current_state.fil - j][current_state.col - i] = sensores.terreno[index++];
+						matriz[current_state.fil - j][current_state.col - i] = terreno[index++];
 		 			}
     			}
 			}
 		break;
 
 		case noreste:
-		matriz[current_state.fil - 1][current_state.col] = sensores.terreno[1];
-		matriz[current_state.fil - 1][current_state.col + 1] = sensores.terreno[2];
-		matriz[current_state.fil][current_state.col + 1] = sensores.terreno[3]; 
-		matriz[current_state.fil - 2][current_state.col] = sensores.terreno[4]; 
-		matriz[current_state.fil - 2][current_state.col + 1] = sensores.terreno[5]; 
-		matriz[current_state.fil - 2][current_state.col + 2] = sensores.terreno[6]; 
-		matriz[current_state.fil - 1][current_state.col + 2] = sensores.terreno[7]; 
-		matriz[current_state.fil][current_state.col + 2] = sensores.terreno[8];
-		if (sensores.terreno[9]!= '?'){
-			matriz[current_state.fil - 3][current_state.col] = sensores.terreno[9]; 
+		matriz[current_state.fil - 1][current_state.col] = terreno[1];
+		matriz[current_state.fil - 1][current_state.col + 1] = terreno[2];
+		matriz[current_state.fil][current_state.col + 1] = terreno[3]; 
+		matriz[current_state.fil - 2][current_state.col] = terreno[4]; 
+		matriz[current_state.fil - 2][current_state.col + 1] = terreno[5]; 
+		matriz[current_state.fil - 2][current_state.col + 2] = terreno[6]; 
+		matriz[current_state.fil - 1][current_state.col + 2] = terreno[7]; 
+		matriz[current_state.fil][current_state.col + 2] = terreno[8];
+		if (terreno[9]!= '?'){
+			matriz[current_state.fil - 3][current_state.col] = terreno[9]; 
 		}
-		matriz[current_state.fil - 3][current_state.col + 1] = sensores.terreno[10]; 
-		if (sensores.terreno[11]!= '?'){
-			matriz[current_state.fil - 3][current_state.col + 2] = sensores.terreno[11]; 
+		matriz[current_state.fil - 3][current_state.col + 1] = terreno[10]; 
+		if (terreno[11]!= '?'){
+			matriz[current_state.fil - 3][current_state.col + 2] = terreno[11]; 
 		}
-		if (sensores.terreno[12]!= '?'){
-			matriz[current_state.fil - 3][current_state.col + 3] = sensores.terreno[12]; 
+		if (terreno[12]!= '?'){
+			matriz[current_state.fil - 3][current_state.col + 3] = terreno[12]; 
 		}
-		if (sensores.terreno[13]!= '?'){
-			matriz[current_state.fil - 2][current_state.col + 3] = sensores.terreno[13]; 
+		if (terreno[13]!= '?'){
+			matriz[current_state.fil - 2][current_state.col + 3] = terreno[13]; 
 		}
 		
-		matriz[current_state.fil - 1][current_state.col + 3] = sensores.terreno[14]; 
-		matriz[current_state.fil][current_state.col + 3] = sensores.terreno[15];
+		matriz[current_state.fil - 1][current_state.col + 3] = terreno[14]; 
+		matriz[current_state.fil][current_state.col + 3] = terreno[15];
 		break;
 		
 		 case noroeste: 
-		matriz[current_state.fil][current_state.col-1] = sensores.terreno[1];
-		matriz[current_state.fil - 1][current_state.col - 1] = sensores.terreno[2];
-		matriz[current_state.fil-1][current_state.col] = sensores.terreno[3]; 
-		matriz[current_state.fil ][current_state.col-2] = sensores.terreno[4]; 
-		matriz[current_state.fil - 1][current_state.col - 2] = sensores.terreno[5]; 
-		matriz[current_state.fil - 2][current_state.col - 2] = sensores.terreno[6]; 
-		matriz[current_state.fil - 2][current_state.col - 1] = sensores.terreno[7]; 
-		matriz[current_state.fil-2][current_state.col] = sensores.terreno[8]; 
-		if (sensores.terreno[9]!= '?'){
-		matriz[current_state.fil][current_state.col-3] = sensores.terreno[9]; 
+		matriz[current_state.fil][current_state.col-1] = terreno[1];
+		matriz[current_state.fil - 1][current_state.col - 1] = terreno[2];
+		matriz[current_state.fil-1][current_state.col] = terreno[3]; 
+		matriz[current_state.fil ][current_state.col-2] = terreno[4]; 
+		matriz[current_state.fil - 1][current_state.col - 2] = terreno[5]; 
+		matriz[current_state.fil - 2][current_state.col - 2] = terreno[6]; 
+		matriz[current_state.fil - 2][current_state.col - 1] = terreno[7]; 
+		matriz[current_state.fil-2][current_state.col] = terreno[8]; 
+		if (terreno[9]!= '?'){
+		matriz[current_state.fil][current_state.col-3] = terreno[9]; 
 		}
-		matriz[current_state.fil - 1][current_state.col - 3] = sensores.terreno[10]; 
-		if (sensores.terreno[11]!= '?'){
-		matriz[current_state.fil - 2][current_state.col - 3] = sensores.terreno[11]; 
+		matriz[current_state.fil - 1][current_state.col - 3] = terreno[10]; 
+		if (terreno[11]!= '?'){
+		matriz[current_state.fil - 2][current_state.col - 3] = terreno[11]; 
 		}
-		if (sensores.terreno[12]!= '?'){
-		matriz[current_state.fil - 3][current_state.col - 3] = sensores.terreno[12]; 
+		if (terreno[12]!= '?'){
+		matriz[current_state.fil - 3][current_state.col - 3] = terreno[12]; 
 		}
-		if (sensores.terreno[13]!= '?'){
-		matriz[current_state.fil - 3][current_state.col - 2] = sensores.terreno[13]; 
+		if (terreno[13]!= '?'){
+		matriz[current_state.fil - 3][current_state.col - 2] = terreno[13]; 
 		}
-		matriz[current_state.fil - 3][current_state.col - 1] = sensores.terreno[14]; 
-		matriz[current_state.fil-3][current_state.col] = sensores.terreno[15];
+		matriz[current_state.fil - 3][current_state.col - 1] = terreno[14]; 
+		matriz[current_state.fil-3][current_state.col] = terreno[15];
 		break;
 		
 		case sureste:
-		matriz[current_state.fil][current_state.col+1] = sensores.terreno[1];
-    	matriz[current_state.fil + 1][current_state.col + 1] = sensores.terreno[2];
-    	matriz[current_state.fil+1][current_state.col ] = sensores.terreno[3]; 
-    	matriz[current_state.fil][current_state.col+2] = sensores.terreno[4]; 
-    	matriz[current_state.fil + 1][current_state.col + 2] = sensores.terreno[5]; 
-    	matriz[current_state.fil + 2][current_state.col + 2] = sensores.terreno[6]; 
-    	matriz[current_state.fil + 2][current_state.col + 1] = sensores.terreno[7]; 
-    	matriz[current_state.fil+2][current_state.col] = sensores.terreno[8]; 
-		if (sensores.terreno[9]!= '?'){
-    	matriz[current_state.fil][current_state.col+3] = sensores.terreno[9]; 
+		matriz[current_state.fil][current_state.col+1] = terreno[1];
+    	matriz[current_state.fil + 1][current_state.col + 1] = terreno[2];
+    	matriz[current_state.fil+1][current_state.col ] = terreno[3]; 
+    	matriz[current_state.fil][current_state.col+2] = terreno[4]; 
+    	matriz[current_state.fil + 1][current_state.col + 2] = terreno[5]; 
+    	matriz[current_state.fil + 2][current_state.col + 2] = terreno[6]; 
+    	matriz[current_state.fil + 2][current_state.col + 1] = terreno[7]; 
+    	matriz[current_state.fil+2][current_state.col] = terreno[8]; 
+		if (terreno[9]!= '?'){
+    	matriz[current_state.fil][current_state.col+3] = terreno[9]; 
 		}
-    	matriz[current_state.fil + 1][current_state.col + 3] = sensores.terreno[10];
-		if (sensores.terreno[11]!= '?'){ 
-    	matriz[current_state.fil + 2][current_state.col + 3] = sensores.terreno[11];
+    	matriz[current_state.fil + 1][current_state.col + 3] = terreno[10];
+		if (terreno[11]!= '?'){ 
+    	matriz[current_state.fil + 2][current_state.col + 3] = terreno[11];
 		} 
-		if (sensores.terreno[12]!= '?'){
-    	matriz[current_state.fil + 3][current_state.col + 3] = sensores.terreno[12];
+		if (terreno[12]!= '?'){
+    	matriz[current_state.fil + 3][current_state.col + 3] = terreno[12];
 		}
-		if (sensores.terreno[13]!= '?'){ 
-    	matriz[current_state.fil + 3][current_state.col + 2] = sensores.terreno[13]; 
+		if (terreno[13]!= '?'){ 
+    	matriz[current_state.fil + 3][current_state.col + 2] = terreno[13]; 
 		}
-    	matriz[current_state.fil + 3][current_state.col + 1] = sensores.terreno[14]; 
-    	matriz[current_state.fil+3][current_state.col] = sensores.terreno[15];
+    	matriz[current_state.fil + 3][current_state.col + 1] = terreno[14]; 
+    	matriz[current_state.fil+3][current_state.col] = terreno[15];
     break;
 		
 		 case suroeste:
-		matriz[current_state.fil+1][current_state.col] = sensores.terreno[1];
-		matriz[current_state.fil + 1][current_state.col - 1] = sensores.terreno[2];
-		matriz[current_state.fil][current_state.col - 1] = sensores.terreno[3]; 
-		matriz[current_state.fil + 2][current_state.col] = sensores.terreno[4]; 
-		matriz[current_state.fil + 2][current_state.col - 1] = sensores.terreno[5]; 
-		matriz[current_state.fil + 2][current_state.col - 2] = sensores.terreno[6]; 
-		matriz[current_state.fil + 1][current_state.col - 2] = sensores.terreno[7]; 
-		matriz[current_state.fil][current_state.col - 2] = sensores.terreno[8]; 
-		if (sensores.terreno[9]!= '?'){
-		matriz[current_state.fil + 3][current_state.col] = sensores.terreno[9]; 
+		matriz[current_state.fil+1][current_state.col] = terreno[1];
+		matriz[current_state.fil + 1][current_state.col - 1] = terreno[2];
+		matriz[current_state.fil][current_state.col - 1] = terreno[3]; 
+		matriz[current_state.fil + 2][current_state.col] = terreno[4]; 
+		matriz[current_state.fil + 2][current_state.col - 1] = terreno[5]; 
+		matriz[current_state.fil + 2][current_state.col - 2] = terreno[6]; 
+		matriz[current_state.fil + 1][current_state.col - 2] = terreno[7]; 
+		matriz[current_state.fil][current_state.col - 2] = terreno[8]; 
+		if (terreno[9]!= '?'){
+		matriz[current_state.fil + 3][current_state.col] = terreno[9]; 
 		}
-		matriz[current_state.fil + 3][current_state.col - 1] = sensores.terreno[10]; 
-		if (sensores.terreno[11]!= '?'){
-		matriz[current_state.fil + 3][current_state.col - 2] = sensores.terreno[11]; 
+		matriz[current_state.fil + 3][current_state.col - 1] = terreno[10]; 
+		if (terreno[11]!= '?'){
+		matriz[current_state.fil + 3][current_state.col - 2] = terreno[11]; 
 		}
-		if (sensores.terreno[12]!= '?'){
-		matriz[current_state.fil + 3][current_state.col - 3] = sensores.terreno[12]; 
+		if (terreno[12]!= '?'){
+		matriz[current_state.fil + 3][current_state.col - 3] = terreno[12]; 
 		}
-		if (sensores.terreno[13]!= '?'){
-		matriz[current_state.fil + 2][current_state.col - 3] = sensores.terreno[13]; 
+		if (terreno[13]!= '?'){
+		matriz[current_state.fil + 2][current_state.col - 3] = terreno[13]; 
 		}
-		matriz[current_state.fil + 1][current_state.col - 3] = sensores.terreno[14]; 
-		matriz[current_state.fil][current_state.col - 3] = sensores.terreno[15];
+		matriz[current_state.fil + 1][current_state.col - 3] = terreno[14]; 
+		matriz[current_state.fil][current_state.col - 3] = terreno[15];
 		break;
 	
 }
