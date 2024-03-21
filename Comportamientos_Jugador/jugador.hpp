@@ -42,16 +42,15 @@ class ComportamientoJugador : public Comportamiento{
 
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
-    bool canWalk(Sensores &sensores);
     bool hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
-    bool dentroMapa();
     void movimiento(Action accion);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
     Action salirAtrapado(Sensores &sensores);
     bool estaAtrapado(Sensores &sensores);
     void detectarPosicionamiento(Sensores &sensores);
+    bool recargar(Sensores &sensores);
   private:
 
   // Declarar aquí las variables de estado

@@ -14,10 +14,15 @@ Action ComportamientoJugador::think(Sensores sensores)
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	detectarPosicionamiento(sensores);
+	if (sensores.reset){
+		reinicio(sensores);
+	}
+	if (recargar(sensores)){
+		accion = actIDLE;
+	}
 	if (atrapado){
 		accion = salirAtrapado(sensores);
 	} else{
-
 		if (hayObstaculo(sensores)){
 			if (rand()%2 == 0){
 				accion = actTURN_L;
@@ -32,13 +37,11 @@ Action ComportamientoJugador::think(Sensores sensores)
 			}else {
 				accion = actWALK;
 			}
-			
 		}
 			
 	} if(bien_situado)
 		mapTerreno(sensores.terreno, mapaResultado);
 
-			
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
@@ -58,13 +61,16 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	current_state.fil =  current_state.col = tam_mapa;
 	current_state.brujula = norte;
 	bien_situado = false;
+	tiene_bikini = tiene_zapatillas = false;
 	last_action = actIDLE;
 }
-
+bool ComportamientoJugador::recargar(Sensores &sensores){
+	return (sensores.terreno[0] == 'X' && sensores.bateria < 4000);
+}
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
-	return (terreno_frente == 'M' || terreno_frente == 'P');
+	return (terreno_frente == 'M' || terreno_frente == 'P'|| (terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini));
 }
 Action ComportamientoJugador::salirAtrapado(Sensores &sensores){	
 	if (primer_paso){
@@ -99,6 +105,7 @@ Action ComportamientoJugador::salirAtrapado(Sensores &sensores){
 	}
 
 }
+
 bool ComportamientoJugador::estaAtrapado(Sensores &sensores){
 	if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
 	 sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
@@ -118,24 +125,6 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	}
 }
 // Comprobar si delante es transitable o tienes bikini/zapatillas
-bool ComportamientoJugador::canWalk(Sensores &sensores){
-	char terreno_frente = sensores.terreno[2];
-    bool esTransitable = false;
-	if (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G' ||terreno_frente == 'K' || terreno_frente == 'D' || terreno_frente == 'X'){
-		esTransitable = true;
-	}	 if (terreno_frente == 'A' && tiene_bikini) {
-        esTransitable = true;
-    } else if (terreno_frente == 'B' && tiene_zapatillas) {
-        esTransitable = true;
-    }
-	if (esTransitable && sensores.agentes[2] == '_'){
-		esTransitable = false;
-		return true;
-	} else {
-		return false;
-	}
-
-}
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 	char terreno_actual = sensores.terreno[0];
@@ -146,16 +135,6 @@ void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 	}
 }
 
-// Comprobar si está dentro del mapa para evitar segmentation error
-/*
-bool ComportamientoJugador::dentroMapa(){
-	cout << current_state.fil << endl;
-	cout << current_state.col << endl;
-	cout << tam_mapa << endl;
-	return (current_state.fil >= 0 && current_state.fil < tam_mapa &&
-    current_state.col >= 0 && current_state.col < tam_mapa);
-} 
-*/
 
 // Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion){
@@ -207,9 +186,7 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				if (index == 6 || index == 11 || index == 12 || index == 13){
-					if(terreno[index != '?']){
-						matriz[current_state.fil - i][current_state.col + j] = terreno[index++];
-					} else {
+					if(terreno[index] != '?'){
 						matriz[current_state.fil - i][current_state.col + j] = terreno[index++];
 					}
 				}
@@ -222,7 +199,7 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 6 || index == 11 || index == 12 || index == 13){
-					if (terreno[index != '?']){
+					if (terreno[index] != '?'){
 						matriz[current_state.fil + i][current_state.col - j] = terreno[index++];
 					}
 				 } else {
@@ -237,7 +214,7 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 			for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 6 || index == 11 || index == 12 || index == 13){
-					if (terreno[index != '?']){
+					if (terreno[index]!= '?'){
 						matriz[current_state.fil + j][current_state.col + i] = terreno[index++];
 					}
 				 } else {
@@ -252,7 +229,7 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 				 if (index == 6 || index == 11 || index == 12 || index == 13){
-					if (terreno[index != '?']){
+					if (terreno[index] != '?'){
 						matriz[current_state.fil - j][current_state.col - i] = terreno[index++];
 					}
 				 } else {
