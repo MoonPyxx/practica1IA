@@ -7,8 +7,6 @@ struct state{
   int fil;
   int col;
   Orientacion brujula;
-  bool tiene_bikini;
-  bool tiene_zapatillas;
 };
 
 class ComportamientoJugador : public Comportamiento{
@@ -18,13 +16,23 @@ class ComportamientoJugador : public Comportamiento{
       // Constructor de la clase
       // Dar el valor inicial a las variables de estado
       current_state.brujula = norte;
-      current_state.fil = 99;
-      current_state.col = 99;
-      current_state.tiene_bikini = false;
-      current_state.tiene_zapatillas = false;
+      current_state.fil = size;
+      current_state.col = size;
+      tiene_bikini = false;
+      tiene_zapatillas = false;
       last_action = actIDLE;
       bien_situado = false;
-      // tam_mapa = size/2;
+
+    // variables escapar
+
+    atrapado = false;
+    primer_paso = true;
+    segundo_paso = false;
+    tercer_paso = false;
+    cuarto_paso = false;
+    quinto_paso = false;
+
+    tam_mapa = size;
     //  mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
 
     }
@@ -43,27 +51,33 @@ class ComportamientoJugador : public Comportamiento{
     void reinicio(Sensores &sensores);
     Action salirAtrapado(Sensores &sensores);
     bool estaAtrapado(Sensores &sensores);
+    void detectarPosicionamiento(Sensores &sensores);
   private:
 
   // Declarar aquí las variables de estado
 
-  bool girar_derecha;
   Action last_action;
   Orientacion brujula;
   state current_state;
   bool bien_situado;
-  int tam_mapa;
-  bool atrapado;
+  int tam_mapa; // arreglar
+
+  // variables objetos
+  bool tiene_bikini;
+  bool tiene_zapatillas;
+
+
 
   // variables para escapar
-  bool primer_paso = true;
-  bool segundo_paso = false;
-  bool tercer_paso = false;
-  bool cuarto_paso = false;
-  bool quinto_paso = false;
-  
+  bool atrapado;
+  bool primer_paso;
+  bool segundo_paso;
+  bool tercer_paso;
+  bool cuarto_paso;
+  bool quinto_paso;
 
-  vector<vector<unsigned char>> mapaAuxiliar;
+
+  // vector<vector<unsigned char>> mapaAuxiliar;
 
 };
 #endif
