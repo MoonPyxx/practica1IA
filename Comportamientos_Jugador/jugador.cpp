@@ -14,7 +14,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 	} 
 
 
-
+	añadirObjeto(sensores);
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	if (sensores.terreno[0] == 'G'){
@@ -81,7 +81,7 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 bool ComportamientoJugador::canWalk(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
-    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G');
+    bool esTransitable = (terreno_frente == 'T' || terreno_frente == 'S' || terreno_frente == 'G' ||terreno_frente == 'K' || terreno_frente == 'D' || terreno_frente == 'X');
 	 if (terreno_frente == 'A' && current_state.tiene_bikini) {
         esTransitable = true;
     } else if (terreno_frente == 'B' && current_state.tiene_zapatillas) {
@@ -94,8 +94,13 @@ bool ComportamientoJugador::canWalk(Sensores &sensores){
 }
 
 // Detectar si hay un objeto (bikini, zapatillas o recarga)
-bool ComportamientoJugador::detectarObjeto(Sensores &sensores){
-	return (sensores.terreno[2] == 'D' || sensores.terreno[2] == 'X' || sensores.terreno[2] == 'K');
+void ComportamientoJugador::añadirObjeto(Sensores &sensores){
+	char terreno_frente = sensores.terreno[2];
+	if (terreno_frente == 'D'){
+		current_state.tiene_zapatillas = true;
+	} else if(terreno_frente == 'K'){
+		current_state.tiene_bikini = true;
+	}
 }
 
 // Comprobar si está dentro del mapa para evitar segmentation error
