@@ -41,6 +41,8 @@ class ComportamientoJugador : public Comportamiento{
     void movimiento(Action accion);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
+    Action salirAtrapado(Sensores &sensores);
+    bool estaAtrapado(Sensores &sensores);
   private:
 
   // Declarar aquí las variables de estado
@@ -51,6 +53,15 @@ class ComportamientoJugador : public Comportamiento{
   state current_state;
   bool bien_situado;
   int tam_mapa;
+  bool atrapado;
+
+  // variables para escapar
+  bool primer_paso = true;
+  bool segundo_paso = false;
+  bool tercer_paso = false;
+  bool cuarto_paso = false;
+  bool quinto_paso = false;
+  
 
   vector<vector<unsigned char>> mapaAuxiliar;
 

@@ -6,15 +6,11 @@ Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
 
-	// debug
-	if (current_state.tiene_bikini){
-		cout << "Tiene bikini" << endl;
-	} else if(current_state.tiene_zapatillas){
-		cout << "Tiene zapatillas" << endl;
-	} 
-
-
 	añadirObjeto(sensores);
+	if(estaAtrapado(sensores)){
+		atrapado = true;
+		salirAtrapado(sensores);
+	}
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	if (sensores.terreno[0] == 'G'){
@@ -23,6 +19,9 @@ Action ComportamientoJugador::think(Sensores sensores)
 		current_state.brujula = sensores.sentido;
 		bien_situado = true;
 	}
+	if (atrapado){
+		accion = salirAtrapado(sensores);
+	} else{
 	if (!bien_situado){
 		if (hayObstaculo(sensores)){
 			if (rand()%2 == 0){
@@ -31,7 +30,6 @@ Action ComportamientoJugador::think(Sensores sensores)
 				accion = actTURN_SR;
 			}
 		} else{
-
 			accion = actWALK;
 		}
 			
@@ -49,6 +47,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		girar_derecha = (rand()%2 == 0);
 		}
 		
+	}
 	}
 	// Recordar la ultima accion
 	last_action = accion;
@@ -77,7 +76,49 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	return (terreno_frente == 'M' || terreno_frente == 'P');
 }
+Action ComportamientoJugador::salirAtrapado(Sensores &sensores){	
+	if (primer_paso){
+		primer_paso = false;
+		segundo_paso = true;
+		cout << "primer paso detectado" << endl;
+		return actWALK;
+	} else if(segundo_paso){
+		cout << "segundo paso detectado" << endl;
+		segundo_paso = false;
+		tercer_paso = true;
+		return actWALK;
+	} else if(tercer_paso){
+		cout << "tercer paso detectado" << endl;
+		tercer_paso = false;
+		cuarto_paso = true;
+		return actWALK;
+	} else if(cuarto_paso){
+		cout << "cuarto paso detectado" << endl;
+		cuarto_paso = false;
+		quinto_paso = true;
+		return actTURN_SR;
+	} else if(quinto_paso){
+		cout << "quinto paso detectado" << endl;
+		quinto_paso = false;
+		primer_paso = true;
+		atrapado = false;
+		return actTURN_SR;
+	} else {
+		cout << "Error en la salida del atrapado" << endl;
+		return actIDLE;
+	}
 
+}
+bool ComportamientoJugador::estaAtrapado(Sensores &sensores){
+	if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
+	 sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
+	 sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
+	   sensores.terreno[13] == 'M'){
+		return true;
+	} else {
+		return false;
+	}
+}
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 bool ComportamientoJugador::canWalk(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
