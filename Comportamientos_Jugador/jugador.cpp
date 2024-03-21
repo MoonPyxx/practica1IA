@@ -22,7 +22,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 	if (atrapado){
 		accion = salirAtrapado(sensores);
 	} else{
-	if (!bien_situado){
+
 		if (hayObstaculo(sensores)){
 			if (rand()%2 == 0){
 				accion = actTURN_L;
@@ -30,25 +30,20 @@ Action ComportamientoJugador::think(Sensores sensores)
 				accion = actTURN_SR;
 			}
 		} else{
-			accion = actWALK;
+			if (rand()%10==0){
+				accion = actTURN_L;
+			} else if(rand()%12==0) {
+				accion = actTURN_SR;
+			}else {
+				accion = actWALK;
+			}
+			
 		}
 			
-	} else{
+	} if(bien_situado)
 		mapTerreno(sensores.terreno, mapaResultado);
-			// Comprobar que está dentro de mapa y que puede andar
-	if (canWalk(sensores) && dentroMapa()){
- 		accion = actWALK;
- 		} else if (!girar_derecha){
-			accion = actTURN_L;
-			girar_derecha = (rand()%2 == 0);
 
-		} else {
- 		accion = actTURN_SR;
-		girar_derecha = (rand()%2 == 0);
-		}
-		
-	}
-	}
+			
 	// Recordar la ultima accion
 	last_action = accion;
 	return accion;
