@@ -9,6 +9,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 	// cout << current_state.fil << " " << current_state.col << endl;
 	añadirObjeto(sensores);
 	estaAtrapado(sensores);
+	detectarObjetos(sensores);
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	detectarPosicionamiento(sensores);
@@ -16,7 +17,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		reinicio(sensores);
 	}
 	if (recargar(sensores)){
-		accion = actIDLE;
+		acciones_pendientes.push(actIDLE);
 	}
 	if (!acciones_pendientes.empty()){
 		accion = acciones_pendientes.front();
@@ -94,9 +95,7 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 		}
 	}
 
-void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 
-}
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G'){
@@ -179,6 +178,36 @@ void ComportamientoJugador::movimiento(Action accion){
 		current_state.brujula = static_cast<Orientacion>(a);
 		break;
 	}
+}
+void ComportamientoJugador::detectarObjetos(Sensores &sensores){
+	int casillas_sensor = 15;
+	if (acciones_pendientes.empty()){
+		if (current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste){ 
+		  if ((sensores.terreno[1] == 'X' && sensores.bateria < 4000)|| (sensores.terreno[1] == 'K' && !tiene_bikini) || (sensores.terreno[1] == 'D' && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
+			cout << "Objeto detectado en la casilla 1" << endl;
+			acciones_pendientes.push(actWALK);
+			acciones_pendientes.push(actTURN_L);
+			acciones_pendientes.push(actWALK);
+		  } else if((sensores.terreno[2] == 'X' && sensores.bateria < 4000)|| (sensores.terreno[2] == 'K' && !tiene_bikini) || (sensores.terreno[2] == 'D' && !tiene_zapatillas) || (sensores.terreno[2] == 'G' && !bien_situado)) {
+			cout << "Objeto detectado en la casilla 2" << endl;
+			acciones_pendientes.push(actWALK);
+		} 	else if((sensores.terreno[3] == 'X' && sensores.bateria < 4000)|| (sensores.terreno[3] == 'K' && !tiene_bikini) || (sensores.terreno[3] == 'D' && !tiene_zapatillas) || (sensores.terreno[3] == 'G' && !bien_situado)) {
+			cout << "Objeto detectado en la casilla 3" << endl;
+			acciones_pendientes.push(actWALK);
+			acciones_pendientes.push(actTURN_SR);
+			acciones_pendientes.push(actTURN_SR);
+			acciones_pendientes.push(actWALK);
+		} else if((sensores.terreno[4] == 'X' && sensores.bateria < 4000)|| (sensores.terreno[4] == 'K' && !tiene_bikini) || (sensores.terreno[4] == 'D' && !tiene_zapatillas) || (sensores.terreno[4] == 'G' && !bien_situado)) {
+			cout << "Objeto detectado en la casilla 4" << endl;
+			acciones_pendientes.push(actWALK);
+			acciones_pendientes.push(actWALK);
+			acciones_pendientes.push(actTURN_L);
+			acciones_pendientes.push(actWALK);
+			acciones_pendientes.push(actWALK);
+		}
+
+	}
+}
 }
 // Mapear el terreno en maparesultado (a medias)
 void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){

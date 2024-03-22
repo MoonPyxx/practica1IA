@@ -45,6 +45,7 @@ class ComportamientoJugador : public Comportamiento{
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
+
   private:
 
   // Declarar aquí las variables de estado
