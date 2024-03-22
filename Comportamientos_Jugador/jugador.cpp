@@ -6,7 +6,7 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	 cout << "Fila: " << current_state.fil << " Columna: " << current_state.col << endl;
+	// cout << "Fila: " << current_state.fil << " Columna: " << current_state.col << endl;
 	añadirObjeto(sensores);
 	estaAtrapado(sensores);
 	detectarObjetos(sensores);
@@ -36,7 +36,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 				accion = actTURN_SR;
 			}else {
 				accion = actWALK;
-			}
+
+		}
 		}
 		/* Arreglar mapa auxiliar luego
 			mapTerreno(sensores.terreno, mapaAuxiliar);
@@ -67,15 +68,18 @@ int ComportamientoJugador::interact(Action accion, int valor)
 // Reiniciar
 
 void ComportamientoJugador::reinicio(Sensores &sensores){
-
+	cout << "Se ha producido un reinicio " << endl;
 	current_state.fil =  current_state.col = tam_mapa;
 	current_state.brujula = norte;
 	bien_situado = false;
 	tiene_bikini = tiene_zapatillas = false;
 	last_action = actIDLE;
+	while (!acciones_pendientes.empty()){
+		acciones_pendientes.pop();
+	}
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
-	return (sensores.terreno[0] == 'X' && sensores.bateria < 4000);
+	return (sensores.terreno[0] == 'X' && sensores.bateria < sensores.vida);
 }
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
@@ -113,6 +117,19 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 		actualizarMapaConAuxiliar(sensores.posF, sensores.posC);
 	}
 }
+
+// Comprobar si delante es transitable o tienes bikini/zapatillas
+
+void ComportamientoJugador::añadirObjeto(Sensores &sensores){
+	char terreno_actual = sensores.terreno[0];
+	if (terreno_actual == 'D'){
+		tiene_zapatillas = true;
+	} else if(terreno_actual == 'K'){
+		tiene_bikini = true;
+	}
+}
+
+
 void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
 	// Implementar mapa auxiliar luego
 	// Orientation (situado.brujula - no_situado.brujula +8) %8
@@ -132,18 +149,6 @@ void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
     }
 	*/
 }
-
-// Comprobar si delante es transitable o tienes bikini/zapatillas
-
-void ComportamientoJugador::añadirObjeto(Sensores &sensores){
-	char terreno_actual = sensores.terreno[0];
-	if (terreno_actual == 'D'){
-		tiene_zapatillas = true;
-	} else if(terreno_actual == 'K'){
-		tiene_bikini = true;
-	}
-}
-
 
 // Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion){
@@ -187,7 +192,7 @@ void ComportamientoJugador::movimiento(Action accion){
 }
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
-	int nivel_bateria = 4000;
+	int nivel_bateria = sensores.vida;
 	if (acciones_pendientes.empty()){
 		if (current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste){ 
 		  if ((sensores.terreno[1] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[1] == 'K' && !tiene_bikini) || (sensores.terreno[1] == 'D' && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
@@ -466,6 +471,5 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		matriz[current_state.fil + 1][current_state.col - 3] = terreno[14]; 
 		matriz[current_state.fil][current_state.col - 3] = terreno[15];
 		break;
-	
 }
 }
