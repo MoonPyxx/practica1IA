@@ -83,7 +83,12 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	return (terreno_frente == 'M' || terreno_frente == 'P'|| (terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini));
 }
 bool ComportamientoJugador::hayEntidades(Sensores &sensores){
-	return (sensores.agentes[2] == 'a' || sensores.agentes[2] == 'l') ? true : false;
+	for (int i = 1; i <= 3; i++) {
+        if (sensores.agentes[i] == 'a' || sensores.agentes[i] == 'l') {
+            return true;
+        }
+    }
+    return false;
 }
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
 		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
