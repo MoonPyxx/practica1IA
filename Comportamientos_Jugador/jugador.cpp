@@ -1,16 +1,14 @@
 #include "../Comportamientos_Jugador/jugador.hpp"
 #include <iostream>
+#include <queue>
 using namespace std;
 
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	cout << current_state.fil << " " << current_state.col << endl;
+	// cout << current_state.fil << " " << current_state.col << endl;
 	añadirObjeto(sensores);
-	if(estaAtrapado(sensores)){
-		atrapado = true;
-		salirAtrapado(sensores);
-	}
+	estaAtrapado(sensores);
 	movimiento(accion);	
 	// Si no está bien situado, actualiza la posición
 	detectarPosicionamiento(sensores);
@@ -20,8 +18,9 @@ Action ComportamientoJugador::think(Sensores sensores)
 	if (recargar(sensores)){
 		accion = actIDLE;
 	}
-	if (atrapado){
-		accion = salirAtrapado(sensores);
+	if (!acciones_pendientes.empty()){
+		accion = acciones_pendientes.front();
+		acciones_pendientes.pop();
 	} else{
 		if (hayObstaculo(sensores)){
 			if (rand()%2 == 0){
@@ -38,6 +37,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 				accion = actWALK;
 			}
 		}
+		/* Arreglar mapa auxiliar luego
 			mapTerreno(sensores.terreno, mapaAuxiliar);
 			for (int i = 0; i < tam_mapa*2; ++i) {
         for (int j = 0; j < tam_mapa*2; ++j) {
@@ -46,6 +46,7 @@ Action ComportamientoJugador::think(Sensores sensores)
         std::cout << std::endl;
 		    }
 		cout << endl;
+		*/
 	} if(bien_situado)
 		mapTerreno(sensores.terreno, mapaResultado);
 		
@@ -80,50 +81,23 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	return (terreno_frente == 'M' || terreno_frente == 'P'|| (terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini));
 }
-Action ComportamientoJugador::salirAtrapado(Sensores &sensores){	
-	if (primer_paso){
-		primer_paso = false;
-		segundo_paso = true;
-		cout << "primer paso detectado" << endl;
-		return actWALK;
-	} else if(segundo_paso){
-		cout << "segundo paso detectado" << endl;
-		segundo_paso = false;
-		tercer_paso = true;
-		return actWALK;
-	} else if(tercer_paso){
-		cout << "tercer paso detectado" << endl;
-		tercer_paso = false;
-		cuarto_paso = true;
-		return actWALK;
-	} else if(cuarto_paso){
-		cout << "cuarto paso detectado" << endl;
-		cuarto_paso = false;
-		quinto_paso = true;
-		return actTURN_SR;
-	} else if(quinto_paso){
-		cout << "quinto paso detectado" << endl;
-		quinto_paso = false;
-		primer_paso = true;
-		atrapado = false;
-		return actTURN_SR;
-	} else {
-		cout << "Error en la salida del atrapado" << endl;
-		return actIDLE;
+	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
+		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
+		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
+		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
+		sensores.terreno[13] == 'M'){
+		acciones_pendientes.push(actWALK); 
+  		acciones_pendientes.push(actWALK); 
+  		acciones_pendientes.push(actTURN_SR); 
+  		acciones_pendientes.push(actTURN_SR); 
+		acciones_pendientes.push(actWALK);
+		}
 	}
+
+void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 
 }
 
-bool ComportamientoJugador::estaAtrapado(Sensores &sensores){
-	if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
-	 sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
-	 sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
-	   sensores.terreno[13] == 'M'){
-		return true;
-	} else {
-		return false;
-	}
-}
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G'){
 		current_state.fil = sensores.posF;
@@ -135,10 +109,11 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	}
 }
 void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
+	// Implementar mapa auxiliar luego
 	// Orientation (situado.brujula - no_situado.brujula +8) %8
-	 for (int i = 0; i < tam_mapa; i++) {
-        for (int j = 0; j < tam_mapa; j++) {
-			if (mapaResultado[i][j] == '?' && (fil+i < tam_mapa || col + j < tam_mapa)){
+	/* for (int i = 0; i < mapaResultado.size(); i++) {
+        for (int j = 0; j < mapaResultado.size(); j++) {
+			if (mapaResultado[i][j] == '?' && (fil+i < mapaResultado.size() || col + j < mapaResultado.size())){
 				mapaResultado[i][j] = mapaAuxiliar[fil+i][col+j];
 			}
 			
@@ -150,6 +125,7 @@ void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
             mapaAuxiliar[i][j] = '?';
         }
     }
+	*/
 }
 
 // Comprobar si delante es transitable o tienes bikini/zapatillas

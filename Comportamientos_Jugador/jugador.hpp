@@ -1,6 +1,7 @@
 #ifndef COMPORTAMIENTOJUGADOR_H
 #define COMPORTAMIENTOJUGADOR_H
 
+#include <queue>
 #include "comportamientos/comportamiento.hpp"
 using namespace std;
 struct state{
@@ -23,14 +24,6 @@ class ComportamientoJugador : public Comportamiento{
       last_action = actIDLE;
       bien_situado = false;
 
-    // variables escapar
-
-    atrapado = false;
-    primer_paso = true;
-    segundo_paso = false;
-    tercer_paso = false;
-    cuarto_paso = false;
-    quinto_paso = false;
 
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
@@ -47,11 +40,11 @@ class ComportamientoJugador : public Comportamiento{
     void movimiento(Action accion);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
-    Action salirAtrapado(Sensores &sensores);
-    bool estaAtrapado(Sensores &sensores);
+    void estaAtrapado(Sensores &sensores);
     void detectarPosicionamiento(Sensores &sensores);
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
+    void detectarObjetos(Sensores &sensores);
   private:
 
   // Declarar aquí las variables de estado
@@ -61,20 +54,11 @@ class ComportamientoJugador : public Comportamiento{
   state current_state;
   bool bien_situado;
   int tam_mapa;
+  std::queue<Action> acciones_pendientes;
 
   // variables objetos
   bool tiene_bikini;
   bool tiene_zapatillas;
-
-
-
-  // variables para escapar
-  bool atrapado;
-  bool primer_paso;
-  bool segundo_paso;
-  bool tercer_paso;
-  bool cuarto_paso;
-  bool quinto_paso;
 
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
