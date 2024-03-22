@@ -45,6 +45,7 @@ class ComportamientoJugador : public Comportamiento{
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
+    bool hayEntidades(Sensores &sensores);
 
   private:
 
@@ -55,7 +56,7 @@ class ComportamientoJugador : public Comportamiento{
   state current_state;
   bool bien_situado;
   int tam_mapa;
-  std::queue<Action> acciones_pendientes;
+  queue<Action> acciones_pendientes;
 
   // variables objetos
   bool tiene_bikini;

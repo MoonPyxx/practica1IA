@@ -6,7 +6,7 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	// cout << current_state.fil << " " << current_state.col << endl;
+	 cout << "Fila: " << current_state.fil << " Columna: " << current_state.col << endl;
 	añadirObjeto(sensores);
 	estaAtrapado(sensores);
 	detectarObjetos(sensores);
@@ -23,7 +23,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		accion = acciones_pendientes.front();
 		acciones_pendientes.pop();
 	} else{
-		if (hayObstaculo(sensores)){
+		if (hayObstaculo(sensores) || hayEntidades(sensores)){
 			if (rand()%2 == 0){
 				accion = actTURN_L;
 			} else {
@@ -82,6 +82,9 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	return (terreno_frente == 'M' || terreno_frente == 'P'|| (terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini));
 }
+bool ComportamientoJugador::hayEntidades(Sensores &sensores){
+	return (sensores.agentes[2] == 'a' || sensores.agentes[2] == 'l') ? true : false;
+}
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
 		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
 		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
@@ -94,8 +97,6 @@ bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 		acciones_pendientes.push(actWALK);
 		}
 	}
-
-
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G'){
