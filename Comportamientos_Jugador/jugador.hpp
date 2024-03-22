@@ -33,7 +33,7 @@ class ComportamientoJugador : public Comportamiento{
     quinto_paso = false;
 
     tam_mapa = size;
-    //  mapaAuxiliar = vector<vector<unsigned char>>(size * 2, vector<unsigned char>(size*2, '?'));
+    mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
 
     }
 
@@ -51,6 +51,7 @@ class ComportamientoJugador : public Comportamiento{
     bool estaAtrapado(Sensores &sensores);
     void detectarPosicionamiento(Sensores &sensores);
     bool recargar(Sensores &sensores);
+    void actualizarMapaConAuxiliar(int fil, int col);
   private:
 
   // Declarar aquí las variables de estado
@@ -59,7 +60,7 @@ class ComportamientoJugador : public Comportamiento{
   Orientacion brujula;
   state current_state;
   bool bien_situado;
-  int tam_mapa; // arreglar
+  int tam_mapa;
 
   // variables objetos
   bool tiene_bikini;
@@ -75,8 +76,8 @@ class ComportamientoJugador : public Comportamiento{
   bool cuarto_paso;
   bool quinto_paso;
 
-
-  // vector<vector<unsigned char>> mapaAuxiliar;
+  // mapa
+  vector<vector<unsigned char>> mapaAuxiliar;
 
 };
 #endif

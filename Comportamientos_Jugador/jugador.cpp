@@ -5,7 +5,7 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-
+	cout << current_state.fil << " " << current_state.col << endl;
 	añadirObjeto(sensores);
 	if(estaAtrapado(sensores)){
 		atrapado = true;
@@ -38,9 +38,17 @@ Action ComportamientoJugador::think(Sensores sensores)
 				accion = actWALK;
 			}
 		}
-			
+			mapTerreno(sensores.terreno, mapaAuxiliar);
+			for (int i = 0; i < tam_mapa*2; ++i) {
+        for (int j = 0; j < tam_mapa*2; ++j) {
+            std::cout << mapaAuxiliar[i][j] << " ";
+        }
+        std::cout << std::endl;
+		    }
+		cout << endl;
 	} if(bien_situado)
 		mapTerreno(sensores.terreno, mapaResultado);
+		
 
 	// Recordar la ultima accion
 	last_action = accion;
@@ -122,8 +130,28 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 		current_state.col = sensores.posC;
 		current_state.brujula = sensores.sentido;
 		bien_situado = true;
+
+		actualizarMapaConAuxiliar(sensores.posF, sensores.posC);
 	}
 }
+void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
+	// Orientation (situado.brujula - no_situado.brujula +8) %8
+	 for (int i = 0; i < tam_mapa; i++) {
+        for (int j = 0; j < tam_mapa; j++) {
+			if (mapaResultado[i][j] == '?' && (fil+i < tam_mapa || col + j < tam_mapa)){
+				mapaResultado[i][j] = mapaAuxiliar[fil+i][col+j];
+			}
+			
+        }
+    }
+	// Resetear mapa auxiliar
+	  for (int i = 0; i < tam_mapa*2; i++) { // Asumiendo tam_mapa_auxiliar es el tamaño del mapa auxiliar
+        for (int j = 0; j < tam_mapa*2; j++) {
+            mapaAuxiliar[i][j] = '?';
+        }
+    }
+}
+
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
