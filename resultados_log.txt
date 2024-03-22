@@ -1,0 +1,151 @@
+Ejecutando el juego con el mapa cuadricula.map
+Objeto detectado en la casilla 11
+Instantes de simulacion no consumidos: 498
+Tiempo Consumido: 0.007767
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 26.3
+Porcentaje de mapa descubierto restando errores: 26.3
+----------------------------------------------------
+Ejecutando el juego con el mapa mapa100.map
+Objeto detectado en la casilla 13
+Objeto detectado en la casilla 9
+Objeto detectado en la casilla 11
+Instantes de simulacion no consumidos: 717
+Tiempo Consumido: 0.006982
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 55.33
+Porcentaje de mapa descubierto restando errores: 55.33
+----------------------------------------------------
+Ejecutando el juego con el mapa mapa50.map
+Objeto detectado en la casilla 10
+Objeto detectado en la casilla 14
+Objeto detectado en la casilla 15
+Objeto detectado en la casilla 13
+Instantes de simulacion no consumidos: 761
+Tiempo Consumido: 0.006577
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 97.16
+Porcentaje de mapa descubierto restando errores: 97.16
+----------------------------------------------------
+Ejecutando el juego con el mapa medieval.map
+Objeto detectado en la casilla 9
+Objeto detectado en la casilla 12
+Objeto detectado en la casilla 10
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+Objeto detectado en la casilla 6
+----------------------------------------------------
+Ejecutando el juego con el mapa picto.map
+Objeto detectado en la casilla 10
+Se cayo por un precipicio
+Se ha producido un reinicio 
+Objeto detectado en la casilla 4
+Objeto detectado en la casilla 8
+Objeto detectado en la casilla 12
+Se agotaron los instantes de simulacion
+Instantes de simulacion no consumidos: 0
+Tiempo Consumido: 0.008774
+Nivel Final de Bateria: 140
+Colisiones: 0
+Reinicios: 1
+Porcentaje de mapa descubierto: 47.6978
+Porcentaje de mapa descubierto restando errores: 47.6978
+----------------------------------------------------
+Ejecutando el juego con el mapa luminaliaZA1.map
+Instantes de simulacion no consumidos: 500
+Tiempo Consumido: 0.006278
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 0
+Porcentaje de mapa descubierto restando errores: 0
+----------------------------------------------------
+Ejecutando el juego con el mapa mapa30.map
+Objeto detectado en la casilla 8
+Objeto detectado en la casilla 15
+Objeto detectado en la casilla 10
+Objeto detectado en la casilla 11
+Objeto detectado en la casilla 11
+Objeto detectado en la casilla 4
+Objeto detectado en la casilla 11
+Objeto detectado en la casilla 10
+Instantes de simulacion no consumidos: 366
+Tiempo Consumido: 0.007804
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 100
+Porcentaje de mapa descubierto restando errores: 100
+----------------------------------------------------
+Ejecutando el juego con el mapa mapa75.map
+Objeto detectado en la casilla 10
+Objeto detectado en la casilla 12
+Objeto detectado en la casilla 14
+Objeto detectado en la casilla 14
+Objeto detectado en la casilla 12
+Instantes de simulacion no consumidos: 318
+Tiempo Consumido: 0.008333
+Nivel Final de Bateria: 0
+Colisiones: 2
+Reinicios: 0
+Porcentaje de mapa descubierto: 38.6667
+Porcentaje de mapa descubierto restando errores: 37.8133
+----------------------------------------------------
+Ejecutando el juego con el mapa paldea1.map
+Instantes de simulacion no consumidos: 2900
+Tiempo Consumido: 0.000274
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 0
+Porcentaje de mapa descubierto: 0
+Porcentaje de mapa descubierto restando errores: 0
+----------------------------------------------------
+Ejecutando el juego con el mapa vertigo.map
+Objeto detectado en la casilla 11
+Se cayo por un precipicio
+Se ha producido un reinicio 
+Instantes de simulacion no consumidos: 500
+Tiempo Consumido: 0.006371
+Nivel Final de Bateria: 0
+Colisiones: 0
+Reinicios: 1
+Porcentaje de mapa descubierto: 0
+Porcentaje de mapa descubierto restando errores: 0
+----------------------------------------------------
