@@ -84,7 +84,14 @@ bool ComportamientoJugador::recargar(Sensores &sensores){
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
-	return (terreno_frente == 'M' || terreno_frente == 'P'|| (terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini));
+	bool pocaBateria = sensores.bateria < 3000;
+if (terreno_frente == 'M' || terreno_frente == 'P') {
+    return true; 
+} else if ((terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini)) {
+    return !pocaBateria; 
+} else {
+    return false; 
+}
 }
 bool ComportamientoJugador::hayEntidades(Sensores &sensores){
 	for (int i = 1; i <= 3; i++) {
