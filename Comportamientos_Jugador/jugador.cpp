@@ -193,7 +193,14 @@ void ComportamientoJugador::movimiento(Action accion){
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
 	int nivel_bateria = sensores.vida;
-	if (acciones_pendientes.empty()){
+	bool muro = false;
+	for (int i = 0; i<= 15; i++){
+		if (sensores.terreno[i]== 'M'){
+			muro = true;
+		}
+	}
+	if (acciones_pendientes.empty() && !muro){
+		
 		if (current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste){ 
 		  if ((sensores.terreno[1] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[1] == 'K' && !tiene_bikini) || (sensores.terreno[1] == 'D' && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 1" << endl;
