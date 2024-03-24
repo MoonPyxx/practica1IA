@@ -10,7 +10,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 	añadirObjeto(sensores);
 	estaAtrapado(sensores);
 	detectarObjetos(sensores);
-	movimiento(accion);	
+	movimiento(accion, sensores);	
 	// Si no está bien situado, actualiza la posición
 	detectarPosicionamiento(sensores);
 	if (sensores.reset){
@@ -213,7 +213,8 @@ void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
 }
 
 // Calcular movimiento (actWALK, actRUN)
-void ComportamientoJugador::movimiento(Action accion){
+void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
+	if (!sensores.colision){
 	int a = current_state.brujula;
 	switch(last_action){
 		case actWALK:
@@ -250,6 +251,7 @@ void ComportamientoJugador::movimiento(Action accion){
 		a = (a+6)%8;
 		current_state.brujula = static_cast<Orientacion>(a);
 		break;
+	}
 	}
 }
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){

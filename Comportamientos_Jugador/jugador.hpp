@@ -37,7 +37,7 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
     bool hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
-    void movimiento(Action accion);
+    void movimiento(Action accion, Sensores &sensores);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
     void estaAtrapado(Sensores &sensores);
