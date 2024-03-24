@@ -23,6 +23,7 @@ class ComportamientoJugador : public Comportamiento{
       tiene_zapatillas = false;
       last_action = actIDLE;
       bien_situado = false;
+      usar_mapa = true;
 
 
     tam_mapa = size;
@@ -49,6 +50,8 @@ class ComportamientoJugador : public Comportamiento{
     void limpiarCola();
     void reorientarMapa(Sensores &sensores);
     void rotarMapa(vector<vector<unsigned char>>& map);
+    void borrarMapaAuxiliar();
+    bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
 
   private:
 
@@ -67,6 +70,7 @@ class ComportamientoJugador : public Comportamiento{
 
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
+  bool usar_mapa;
 
 };
 #endif

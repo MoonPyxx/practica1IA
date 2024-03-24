@@ -6,7 +6,6 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	// cout << "Fila: " << current_state.fil << " Columna: " << current_state.col << endl;
 	añadirObjeto(sensores);
 	estaAtrapado(sensores);
 	detectarObjetos(sensores);
@@ -39,12 +38,40 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		}
 		}
-	if (!bien_situado){
-				mapTerreno(sensores.terreno, mapaAuxiliar);
+		// MAPAS (DEBUG)
+		/*
+		cout << "MAPA AUXILIAR: " << endl;
+		for (int i = 0; i < tam_mapa*2; ++i) {
+        for (int j = 0; j < tam_mapa*2; ++j) {
+            std::cout << mapaAuxiliar[i][j] << " ";
+        }
+        cout << endl;
+		    }
+		cout << endl;
 
-	} else{
+		cout << "MAPA RESULTADO: " << endl;
+		for (int i = 0; i < tam_mapa; ++i) {
+		for (int j = 0; j < tam_mapa; ++j) {
+			std::cout << mapaResultado[i][j] << " ";
+		}
+		cout << endl;
+		
+		    }
+			*/
+		if (sensores.nivel==0){
+			current_state.fil = sensores.posF;
+		current_state.col = sensores.posC;
+		current_state.brujula = sensores.sentido;
+			mapTerreno(sensores.terreno, mapaResultado);
+		} else {
+	if (!bien_situado && usar_mapa){
+		mapTerreno(sensores.terreno, mapaAuxiliar);
+		
+	} 
+	if (bien_situado){
 		mapTerreno(sensores.terreno, mapaResultado);
 	
+	}
 	}
 	}
 
@@ -66,6 +93,14 @@ void ComportamientoJugador::limpiarCola(){
 		acciones_pendientes.pop();
 	}
 }
+void ComportamientoJugador::borrarMapaAuxiliar(){
+	for (int i = 0; i < tam_mapa*2; i++) { 
+		for (int j = 0; j < tam_mapa*2; j++) {
+			mapaAuxiliar[i][j] = '?';
+		}
+	}
+}
+
 void ComportamientoJugador::reinicio(Sensores &sensores){
 	cout << "Se ha producido un reinicio " << endl;
 	current_state.fil =  current_state.col = tam_mapa;
@@ -74,12 +109,8 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	tiene_bikini = tiene_zapatillas = false;
 	last_action = actIDLE;
 	limpiarCola();
-	// Resetear mapa auxiliar
-	  for (int i = 0; i < tam_mapa*2; i++) { 
-        for (int j = 0; j < tam_mapa*2; j++) {
-            mapaAuxiliar[i][j] = '?';
-        }
-    }
+	if (usar_mapa)
+	borrarMapaAuxiliar();
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
 	return (sensores.terreno[0] == 'X' && sensores.bateria < sensores.vida);
@@ -121,11 +152,14 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G' && !bien_situado){
 		int fil = current_state.fil - sensores.posF;
 		int col = current_state.col - sensores.posC;
-		if (sensores.nivel == 3)
+		if (usar_mapa){
+			if (sensores.nivel == 3)
 		{
 			reorientarMapa(sensores);
 		}
 		actualizarMapaConAuxiliar(fil, col);
+		}
+		
 		current_state.fil = sensores.posF;
 		current_state.col = sensores.posC;
 		current_state.brujula = sensores.sentido;
@@ -196,22 +230,20 @@ void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 
 
 void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
+
 	 for (int i = 0; i < mapaResultado.size(); i++) {
         for (int j = 0; j < mapaResultado.size(); j++) {
-			if (mapaResultado[i][j] == '?'){
+			if (mapaResultado[i][j] == '?' && dentroDeMapa(fil+i, col+j, tam_mapa*2, tam_mapa*2)){
 				mapaResultado[i][j] = mapaAuxiliar[fil+i][col+j];
 			}
         }
     }
-	// Resetear mapa auxiliar
-	  for (int i = 0; i < tam_mapa*2; i++) { 
-        for (int j = 0; j < tam_mapa*2; j++) {
-            mapaAuxiliar[i][j] = '?';
-        }
-    }
+	borrarMapaAuxiliar();
 	
 }
-
+bool ComportamientoJugador::dentroDeMapa(int fil, int col, int filasMax, int columnasMax){
+	return (fil >= 0 && fil < filasMax && col >= 0 && col < columnasMax);
+}
 // Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 	if (!sensores.colision){
@@ -384,12 +416,16 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		 index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
+				 if (dentroDeMapa(current_state.fil-i, current_state.col + j, matriz.size(), matriz[0].size())) {
 				if (index == 6 || index == 	11 || index == 12 || index == 13){
 					if(terreno[index] != '?'){
 						matriz[current_state.fil - i][current_state.col + j] = terreno[index++];
 					}
-				}
+					} else{
+						matriz[current_state.fil - i][current_state.col + j] = terreno[index++];
 					}
+				}
+			}
     	}
 		break;
 
@@ -397,15 +433,17 @@ void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vec
 		 index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
-				 if (index == 6 || index == 11 || index == 12 || index == 13){
-					if (terreno[index] != '?'){
+				 if (dentroDeMapa(current_state.fil+i, current_state.col - j, matriz.size(), matriz[0].size())) {
+				if (index == 6 || index == 	11 || index == 12 || index == 13){
+					if(terreno[index] != '?'){
 						matriz[current_state.fil + i][current_state.col - j] = terreno[index++];
 					}
-				 } else {
+					} else{
 						matriz[current_state.fil + i][current_state.col - j] = terreno[index++];
-		 			}
-    			}
+					}
+				}
 			}
+    	}
 		break;
 
 		case este:
