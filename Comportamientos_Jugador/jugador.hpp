@@ -46,6 +46,9 @@ class ComportamientoJugador : public Comportamiento{
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
     bool hayEntidades(Sensores &sensores);
+    void limpiarCola();
+    void reorientarMapa(Sensores &sensores);
+    void rotarMapa(vector<vector<unsigned char>>& map);
 
   private:
 

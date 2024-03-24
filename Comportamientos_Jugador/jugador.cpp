@@ -39,19 +39,14 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		}
 		}
-		/* Arreglar mapa auxiliar luego
-			mapTerreno(sensores.terreno, mapaAuxiliar);
-			for (int i = 0; i < tam_mapa*2; ++i) {
-        for (int j = 0; j < tam_mapa*2; ++j) {
-            std::cout << mapaAuxiliar[i][j] << " ";
-        }
-        std::cout << std::endl;
-		    }
-		cout << endl;
-		*/
-	} if(bien_situado)
+	if (!bien_situado){
+				mapTerreno(sensores.terreno, mapaAuxiliar);
+
+	} else{
 		mapTerreno(sensores.terreno, mapaResultado);
-		
+	
+	}
+	}
 
 	// Recordar la ultima accion
 	last_action = accion;
@@ -66,7 +61,11 @@ int ComportamientoJugador::interact(Action accion, int valor)
 // Funciones mias
 
 // Reiniciar
-
+void ComportamientoJugador::limpiarCola(){
+	while (!acciones_pendientes.empty()){
+		acciones_pendientes.pop();
+	}
+}
 void ComportamientoJugador::reinicio(Sensores &sensores){
 	cout << "Se ha producido un reinicio " << endl;
 	current_state.fil =  current_state.col = tam_mapa;
@@ -74,9 +73,13 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	bien_situado = false;
 	tiene_bikini = tiene_zapatillas = false;
 	last_action = actIDLE;
-	while (!acciones_pendientes.empty()){
-		acciones_pendientes.pop();
-	}
+	limpiarCola();
+	// Resetear mapa auxiliar
+	  for (int i = 0; i < tam_mapa*2; i++) { 
+        for (int j = 0; j < tam_mapa*2; j++) {
+            mapaAuxiliar[i][j] = '?';
+        }
+    }
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
 	return (sensores.terreno[0] == 'X' && sensores.bateria < sensores.vida);
@@ -115,14 +118,69 @@ bool ComportamientoJugador::hayEntidades(Sensores &sensores){
 	}
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
-	if (sensores.terreno[0] == 'G'){
+	if (sensores.terreno[0] == 'G' && !bien_situado){
+		int fil = current_state.fil - sensores.posF;
+		int col = current_state.col - sensores.posC;
+		if (sensores.nivel == 3)
+		{
+			reorientarMapa(sensores);
+		}
+		actualizarMapaConAuxiliar(fil, col);
 		current_state.fil = sensores.posF;
 		current_state.col = sensores.posC;
 		current_state.brujula = sensores.sentido;
-		bien_situado = true;
-
-		actualizarMapaConAuxiliar(sensores.posF, sensores.posC);
+		
+	bien_situado = true;
+	limpiarCola();
 	}
+}
+
+void ComportamientoJugador::rotarMapa(vector<vector<unsigned char>>& map) {
+    int N = map.size();
+	// Trasponer matriz
+    for (int i = 0; i < N; i++) {
+        for (int j = i+1; j < N; ++j) {
+            swap(map[i][j], map[j][i]);
+        }
+    }
+
+	// Invertir filas
+	for (int i = 0; i< N/2 ; i++){
+		for (int j = 0; j<N; j++){
+			swap (map[i][j], map[N-i-1][j]);
+		}
+	}
+
+
+}
+void ComportamientoJugador::reorientarMapa(Sensores &sensores){
+	// Calcular la orientación real basada en el cambio de orientación
+	int deltaOrientacion = (current_state.brujula - sensores.sentido + 8 ) % 4;
+
+	cout << "Delta orientacion: " << deltaOrientacion << endl;
+	Orientacion orientacionReal = static_cast<Orientacion>(deltaOrientacion);
+
+
+	switch (orientacionReal){
+		case oeste:
+			rotarMapa(mapaAuxiliar);
+			break;
+		case sur:
+			rotarMapa(mapaAuxiliar);
+			rotarMapa(mapaAuxiliar);
+			break;
+		case este:	
+		cout << "Este" << endl;
+			rotarMapa(mapaAuxiliar);
+			rotarMapa(mapaAuxiliar);
+			rotarMapa(mapaAuxiliar);
+			cout << "Rotado al este" << endl;
+			break;
+
+			default:
+			break;
+	}
+	
 }
 
 // Comprobar si delante es transitable o tienes bikini/zapatillas
@@ -138,23 +196,20 @@ void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 
 
 void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
-	// Implementar mapa auxiliar luego
-	// Orientation (situado.brujula - no_situado.brujula +8) %8
-	/* for (int i = 0; i < mapaResultado.size(); i++) {
+	 for (int i = 0; i < mapaResultado.size(); i++) {
         for (int j = 0; j < mapaResultado.size(); j++) {
-			if (mapaResultado[i][j] == '?' && (fil+i < mapaResultado.size() || col + j < mapaResultado.size())){
+			if (mapaResultado[i][j] == '?'){
 				mapaResultado[i][j] = mapaAuxiliar[fil+i][col+j];
 			}
-			
         }
     }
 	// Resetear mapa auxiliar
-	  for (int i = 0; i < tam_mapa*2; i++) { // Asumiendo tam_mapa_auxiliar es el tamaño del mapa auxiliar
+	  for (int i = 0; i < tam_mapa*2; i++) { 
         for (int j = 0; j < tam_mapa*2; j++) {
             mapaAuxiliar[i][j] = '?';
         }
     }
-	*/
+	
 }
 
 // Calcular movimiento (actWALK, actRUN)
