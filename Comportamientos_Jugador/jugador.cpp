@@ -119,12 +119,12 @@ bool ComportamientoJugador::recargar(Sensores &sensores){
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	bool pocaBateria = sensores.bateria < 3000;
-if (terreno_frente == 'M' || terreno_frente == 'P') {
-    return true; 
-} else if ((terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini)) {
-    return !pocaBateria; 
-} else {
-    return false; 
+		if (terreno_frente == 'M' || terreno_frente == 'P') {
+    		return true; 
+		} else if ((terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini)) {
+    		return !pocaBateria; 
+		} else {
+    		return false; 
 }
 }
 bool ComportamientoJugador::hayEntidades(Sensores &sensores){
