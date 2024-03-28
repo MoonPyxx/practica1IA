@@ -113,15 +113,15 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	borrarMapaAuxiliar();
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
-	return (sensores.terreno[0] == 'X' && sensores.bateria < sensores.vida);
+	return (sensores.terreno[0] == OBJETO_RECARGA && sensores.bateria < sensores.vida);
 }
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	bool pocaBateria = sensores.bateria < 3000;
-		if (terreno_frente == 'M' || terreno_frente == 'P') {
+		if (terreno_frente == TERRENO_MURO || terreno_frente == TERRENO_PRECIPICIO) {
     		return true; 
-		} else if ((terreno_frente == 'B' && !tiene_zapatillas) || (terreno_frente == 'A' && !tiene_bikini)) {
+		} else if ((terreno_frente == TERRENO_BOSQUE && !tiene_zapatillas) || (terreno_frente == TERRENO_AGUA && !tiene_bikini)) {
     		return !pocaBateria; 
 		} else {
     		return false; 
@@ -136,10 +136,10 @@ bool ComportamientoJugador::hayEntidades(Sensores &sensores){
     return false;
 }
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
-		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == 'M' &&
+		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == TERRENO_MURO &&
 		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
 		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
-		sensores.terreno[13] == 'M'){
+		sensores.terreno[13] == TERRENO_MURO){
 		acciones_pendientes.push(actWALK); 
   		acciones_pendientes.push(actWALK); 
   		acciones_pendientes.push(actTURN_SR); 
@@ -221,9 +221,9 @@ void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 	char terreno_actual = sensores.terreno[0];
-	if (terreno_actual == 'D'){
+	if (terreno_actual == OBJETO_ZAPATILLAS){
 		tiene_zapatillas = true;
-	} else if(terreno_actual == 'K'){
+	} else if(terreno_actual == OBJETO_BIKINI){
 		tiene_bikini = true;
 	}
 }
@@ -291,47 +291,47 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int nivel_bateria = sensores.vida;
 	bool muro = false;
 	for (int i = 0; i<= 15; i++){
-		if (sensores.terreno[i]== 'M'){
+		if (sensores.terreno[i]== TERRENO_MURO){
 			muro = true;
 		}
 	}
 	if (acciones_pendientes.empty() && !muro){
 		
 		if (current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste){ 
-		  if ((sensores.terreno[1] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[1] == 'K' && !tiene_bikini) || (sensores.terreno[1] == 'D' && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
+		  if ((sensores.terreno[1] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[1] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[1] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 1" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actTURN_L);
 			acciones_pendientes.push(actWALK);
-		  } else if((sensores.terreno[2] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[2] == 'K' && !tiene_bikini) || (sensores.terreno[2] == 'D' && !tiene_zapatillas) || (sensores.terreno[2] == 'G' && !bien_situado)) {
+		  } else if((sensores.terreno[2] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[2] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[2] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[2] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 2" << endl;
 			acciones_pendientes.push(actWALK);
-		} 	else if((sensores.terreno[3] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[3] == 'K' && !tiene_bikini) || (sensores.terreno[3] == 'D' && !tiene_zapatillas) || (sensores.terreno[3] == 'G' && !bien_situado)) {
+		} 	else if((sensores.terreno[3] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[3] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[3] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[3] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 3" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[4] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[4] == 'K' && !tiene_bikini) || (sensores.terreno[4] == 'D' && !tiene_zapatillas) || (sensores.terreno[4] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[4] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[4] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[4] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[4] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 4" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actTURN_L);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[5] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[5] == 'K' && !tiene_bikini) || (sensores.terreno[5] == 'D' && !tiene_zapatillas) || (sensores.terreno[5] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[5] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[5] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[5] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[5] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 5" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actTURN_L);
 			acciones_pendientes.push(actWALK);
 		}
-		else if((sensores.terreno[6] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[6] == 'K' && !tiene_bikini) || (sensores.terreno[6] == 'D' && !tiene_zapatillas) || (sensores.terreno[6] == 'G' && !bien_situado)) {
+		else if((sensores.terreno[6] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[6] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[6] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[6] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 6" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 		}
-		else if((sensores.terreno[7] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[7] == 'K' && !tiene_bikini) || (sensores.terreno[7] == 'D' && !tiene_zapatillas) || (sensores.terreno[7] == 'G' && !bien_situado)) {
+		else if((sensores.terreno[7] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[7] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[7] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[7] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 7" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -339,7 +339,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actWALK);
 		}
-		else if((sensores.terreno[8] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[8] == 'K' && !tiene_bikini) || (sensores.terreno[8] == 'D' && !tiene_zapatillas) || (sensores.terreno[8] == 'G' && !bien_situado)) {
+		else if((sensores.terreno[8] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[8] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[8] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[8] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 8" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -347,7 +347,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[9] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[9] == 'K' && !tiene_bikini) || (sensores.terreno[9] == 'D' && !tiene_zapatillas) || (sensores.terreno[9] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[9] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[9] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[9] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[9] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 9" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -356,7 +356,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[10] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[10] == 'K' && !tiene_bikini) || (sensores.terreno[10] == 'D' && !tiene_zapatillas) || (sensores.terreno[10] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[10] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[10] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[10] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[10] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 10" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -364,19 +364,19 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actTURN_L);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		}  else if((sensores.terreno[11] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[11] == 'K' && !tiene_bikini) || (sensores.terreno[11] == 'D' && !tiene_zapatillas) || (sensores.terreno[11] == 'G' && !bien_situado)) {
+		}  else if((sensores.terreno[11] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[11] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[11] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[11] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 11" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actTURN_L);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[12] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[12] == 'K' && !tiene_bikini) || (sensores.terreno[12] == 'D' && !tiene_zapatillas) || (sensores.terreno[12] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[12] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[12] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[12] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[12] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 12" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[13] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[13] == 'K' && !tiene_bikini) || (sensores.terreno[13] == 'D' && !tiene_zapatillas) || (sensores.terreno[13] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[13] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[13] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[13] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[13] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 13" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -384,7 +384,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[14] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[14] == 'K' && !tiene_bikini) || (sensores.terreno[14] == 'D' && !tiene_zapatillas) || (sensores.terreno[14] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[14] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[14] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[14] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[14] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 14" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
@@ -393,7 +393,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 			acciones_pendientes.push(actTURN_SR);
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[15] == 'X' && sensores.bateria < nivel_bateria)|| (sensores.terreno[15] == 'K' && !tiene_bikini) || (sensores.terreno[15] == 'D' && !tiene_zapatillas) || (sensores.terreno[15] == 'G' && !bien_situado)) {
+		} else if((sensores.terreno[15] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[15] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[15] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[15] == 'G' && !bien_situado)) {
 			cout << "Objeto detectado en la casilla 15" << endl;
 			acciones_pendientes.push(actWALK);
 			acciones_pendientes.push(actWALK);

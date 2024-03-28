@@ -72,5 +72,13 @@ class ComportamientoJugador : public Comportamiento{
   vector<vector<unsigned char>> mapaAuxiliar;
   bool usar_mapa;
 
+const unsigned char OBJETO_BIKINI = 'K';
+const unsigned char OBJETO_ZAPATILLAS = 'D';
+const unsigned char OBJETO_RECARGA = 'X';
+const unsigned char TERRENO_BOSQUE = 'B';
+const unsigned char TERRENO_PRECIPICIO = 'P';
+const unsigned char TERRENO_MURO = 'M';
+const unsigned char TERRENO_AGUA = 'A';
+
 };
 #endif
