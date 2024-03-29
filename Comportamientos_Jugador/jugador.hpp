@@ -28,6 +28,7 @@ class ComportamientoJugador : public Comportamiento{
 
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
+    mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
 
     }
 
@@ -52,6 +53,8 @@ class ComportamientoJugador : public Comportamiento{
     void rotarMapa(vector<vector<unsigned char>>& map);
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
+    void comprobarMapaTiempos(Sensores &sensores);
+    void accionPorCasilla(int casilla);
 
   private:
 
@@ -71,6 +74,10 @@ class ComportamientoJugador : public Comportamiento{
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
   bool usar_mapa;
+
+
+  // mapa de tiempos
+  vector<vector<double>> mapaTiempos;
 
 const unsigned char OBJETO_BIKINI = 'K';
 const unsigned char OBJETO_ZAPATILLAS = 'D';

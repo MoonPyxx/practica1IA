@@ -38,6 +38,9 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		}
 		}
+	
+		
+
 		// MAPAS (DEBUG)
 		/*
 		cout << "MAPA AUXILIAR: " << endl;
@@ -59,17 +62,20 @@ Action ComportamientoJugador::think(Sensores sensores)
 		    }
 			*/
 		if (sensores.nivel==0){
-			current_state.fil = sensores.posF;
+		current_state.fil = sensores.posF;
 		current_state.col = sensores.posC;
 		current_state.brujula = sensores.sentido;
-			mapTerreno(sensores.terreno, mapaResultado);
+		mapTerreno(sensores.terreno, mapaResultado);
+		mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
+		cout << mapaTiempos[current_state.fil][current_state.col] << endl;
 		} else {
 	if (!bien_situado && usar_mapa){
-		mapTerreno(sensores.terreno, mapaAuxiliar);
-		
+		mapTerreno(sensores.terreno, mapaAuxiliar);		
 	} 
 	if (bien_situado){
 		mapTerreno(sensores.terreno, mapaResultado);
+		mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
+		cout << mapaTiempos[current_state.fil][current_state.col] << endl;
 	
 	}
 	}
@@ -77,7 +83,19 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 	// Recordar la ultima accion
 	last_action = accion;
+
+/*
+	cout << "MAPA TIEMPOS" << endl;
+		for (int i = 0; i < tam_mapa*2; ++i) {
+        for (int j = 0; j < tam_mapa*2; ++j) {
+            cout << mapaTiempos[i][j] << " ";
+        }
+        cout << endl;
+		    }
+		cout << endl;
+*/
 	return accion;
+	
 }
 
 int ComportamientoJugador::interact(Action accion, int valor)
@@ -246,6 +264,7 @@ bool ComportamientoJugador::dentroDeMapa(int fil, int col, int filasMax, int col
 }
 // Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
+
 	if (!sensores.colision){
 	int a = current_state.brujula;
 	switch(last_action){
@@ -296,117 +315,151 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 		}
 	}
 	if (acciones_pendientes.empty() && !muro){
-		
-		if (current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste){ 
-		  if ((sensores.terreno[1] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[1] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[1] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[1] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 1" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
-		  } else if((sensores.terreno[2] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[2] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[2] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[2] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 2" << endl;
-			acciones_pendientes.push(actWALK);
-		} 	else if((sensores.terreno[3] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[3] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[3] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[3] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 3" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[4] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[4] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[4] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[4] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 4" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[5] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[5] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[5] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[5] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 5" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
+		for (int j= 0; j<=15; j++){
+			if ((current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste) && 
+    		((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
+    		(sensores.terreno[j] == OBJETO_BIKINI && !tiene_bikini) || 
+    		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
+    		(sensores.terreno[j] == 'G' && !bien_situado))) {
+				accionPorCasilla(j);
+			}
 		}
-		else if((sensores.terreno[6] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[6] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[6] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[6] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 6" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		}
-		else if((sensores.terreno[7] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[7] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[7] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[7] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 7" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-		}
-		else if((sensores.terreno[8] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[8] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[8] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[8] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 8" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[9] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[9] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[9] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[9] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 9" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[10] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[10] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[10] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[10] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 10" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		}  else if((sensores.terreno[11] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[11] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[11] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[11] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 11" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_L);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[12] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[12] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[12] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[12] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 12" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[13] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[13] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[13] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[13] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 13" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[14] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[14] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[14] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[14] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 14" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} else if((sensores.terreno[15] == OBJETO_RECARGA && sensores.bateria < nivel_bateria)|| (sensores.terreno[15] == OBJETO_BIKINI && !tiene_bikini) || (sensores.terreno[15] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || (sensores.terreno[15] == 'G' && !bien_situado)) {
-			cout << "Objeto detectado en la casilla 15" << endl;
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actTURN_SR);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-			acciones_pendientes.push(actWALK);
-		} 
 	}
 }
+void ComportamientoJugador::accionPorCasilla(int casilla){
+	switch (casilla) {
+            case 1:
+                acciones_pendientes.push(actWALK);
+                acciones_pendientes.push(actTURN_L);
+                acciones_pendientes.push(actWALK);
+                break;
+            case 2:
+                acciones_pendientes.push(actWALK);
+                break;
+            case 3:
+                acciones_pendientes.push(actWALK);
+                acciones_pendientes.push(actTURN_SR);
+                acciones_pendientes.push(actTURN_SR);
+                acciones_pendientes.push(actWALK);
+                break;
+			case 4:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 5:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 6:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 7:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 8:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 9:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 10:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 11:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 12:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 13:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 14:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+			case 15:
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				break;
+
+            default:
+                break;
+        }
 }
+void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
+	char terreno_actual = sensores.terreno[0];
+	char terreno_objetivo;
+	double mejorTiempo = 1.0;
+	int index = 1;
+		switch(current_state.brujula){
+		case norte:
+		 index = 1; 
+		for(int i = 1; i <= 3; ++i) { 
+    		for(int j = -i; j <= i; ++j) { 
+					if(sensores.terreno[index] != '?'){
+						if (mapaTiempos[current_state.fil-i][current_state.col+j] < mejorTiempo){
+							mejorTiempo = mapaTiempos[current_state.fil-i][current_state.col+j];
+							terreno_objetivo = sensores.terreno[index++];
+						} else{
+							index++;
+						}
+					}
+				} 
+			}
+		break;
+		}
+}
+
+
 // Mapear el terreno en maparesultado (a medias)
 void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){
 	matriz[current_state.fil][current_state.col] = terreno[0];
