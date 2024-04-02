@@ -2,6 +2,7 @@
 #define COMPORTAMIENTOJUGADOR_H
 
 #include <queue>
+#include <limits>
 #include "comportamientos/comportamiento.hpp"
 using namespace std;
 struct state{
@@ -36,8 +37,7 @@ class ComportamientoJugador : public Comportamiento{
     ~ComportamientoJugador(){}
 
     Action think(Sensores sensores);
-    int interact(Action accion, int valor);
-    bool hayObstaculo(Sensores &sensores);
+    int hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
     void movimiento(Action accion, Sensores &sensores);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
@@ -47,14 +47,17 @@ class ComportamientoJugador : public Comportamiento{
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
-    bool hayEntidades(Sensores &sensores);
+    int hayEntidades(Sensores &sensores);
     void limpiarCola();
     void reorientarMapa(Sensores &sensores);
-    void rotarMapa(vector<vector<unsigned char>>& map);
+
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
-    void comprobarMapaTiempos(Sensores &sensores);
     void accionPorCasilla(int casilla);
+    void comprobarMapaTiempos(Sensores &sensores);
+    void actualizarMapaTiempos(int fil, int col);
+    template <typename T>
+    void rotarMapa(vector<vector<T>>& map);
 
   private:
 
@@ -79,6 +82,7 @@ class ComportamientoJugador : public Comportamiento{
   // mapa de tiempos
   vector<vector<double>> mapaTiempos;
 
+
 const unsigned char OBJETO_BIKINI = 'K';
 const unsigned char OBJETO_ZAPATILLAS = 'D';
 const unsigned char OBJETO_RECARGA = 'X';
@@ -86,6 +90,7 @@ const unsigned char TERRENO_BOSQUE = 'B';
 const unsigned char TERRENO_PRECIPICIO = 'P';
 const unsigned char TERRENO_MURO = 'M';
 const unsigned char TERRENO_AGUA = 'A';
+
 
 };
 #endif
