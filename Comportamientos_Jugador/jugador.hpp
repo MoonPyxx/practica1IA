@@ -2,6 +2,7 @@
 #define COMPORTAMIENTOJUGADOR_H
 
 #include <queue>
+#include <limits>
 #include "comportamientos/comportamiento.hpp"
 using namespace std;
 struct state{
@@ -50,11 +51,14 @@ class ComportamientoJugador : public Comportamiento{
     bool hayEntidades(Sensores &sensores);
     void limpiarCola();
     void reorientarMapa(Sensores &sensores);
-    void rotarMapa(vector<vector<unsigned char>>& map);
+
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
-    void comprobarMapaTiempos(Sensores &sensores);
     void accionPorCasilla(int casilla);
+    void comprobarMapaTiempos(Sensores &sensores);
+    void actualizarMapaTiempos(int fil, int col);
+    template <typename T>
+    void rotarMapa(vector<vector<T>>& map);
 
   private:
 
@@ -79,6 +83,7 @@ class ComportamientoJugador : public Comportamiento{
   // mapa de tiempos
   vector<vector<double>> mapaTiempos;
 
+
 const unsigned char OBJETO_BIKINI = 'K';
 const unsigned char OBJETO_ZAPATILLAS = 'D';
 const unsigned char OBJETO_RECARGA = 'X';
@@ -86,6 +91,7 @@ const unsigned char TERRENO_BOSQUE = 'B';
 const unsigned char TERRENO_PRECIPICIO = 'P';
 const unsigned char TERRENO_MURO = 'M';
 const unsigned char TERRENO_AGUA = 'A';
+
 
 };
 #endif
