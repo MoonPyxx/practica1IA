@@ -6,64 +6,89 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
+	añadirObjeto(sensores);
+	estaAtrapado(sensores);
+	detectarObjetos(sensores);
+	movimiento(accion, sensores);	
+	// Si no está bien situado, actualiza la posición
+	detectarPosicionamiento(sensores);
+	if (sensores.reset){
+		reinicio(sensores);
+	}
+	if (recargar(sensores)){
+		acciones_pendientes.push(actIDLE);
+	}
+	if (!acciones_pendientes.empty()){
+		accion = acciones_pendientes.front();
+		acciones_pendientes.pop();
+	} else{
+		if (hayObstaculo(sensores) || hayEntidades(sensores)){
+			if (rand()%2 == 0){
+				accion = actTURN_L;
+			} else {
+				accion = actTURN_SR;
+			}
+		} else{
+				accion = actWALK;
+		}
+	
+		
 
-    añadirObjeto(sensores);
-    estaAtrapado(sensores);
-    detectarObjetos(sensores);
-    movimiento(accion, sensores);
-    detectarPosicionamiento(sensores);
-
-    if (sensores.reset) {
-        reinicio(sensores);
-    }
-
-    if (recargar(sensores)) {
-        acciones_pendientes.push(actIDLE);
-    }
-
-    if (!acciones_pendientes.empty()) {
-        accion = acciones_pendientes.front();
-        if (accion == actWALK && sensores.terreno[2] == 'P') {
-            accion = actTURN_SR;
+		// MAPAS (DEBUG)
+		/*
+		cout << "MAPA AUXILIAR: " << endl;
+		for (int i = 0; i < tam_mapa*2; ++i) {
+        for (int j = 0; j < tam_mapa*2; ++j) {
+            std::cout << mapaAuxiliar[i][j] << " ";
         }
-        acciones_pendientes.pop();
-    } else {
-        if (bien_situado) {
-            comprobarMapaTiempos(sensores);
-        }
+        cout << endl;
+		    }
+		cout << endl;
 
-        if (acciones_pendientes.empty()) {
-            if (hayObstaculo(sensores) || hayEntidades(sensores)) {
-                if (rand() % 2 == 0) {
-                    accion = actTURN_L;
-                } else {
-                    accion = actTURN_SR;
-                }
-            } else {
-                accion = actWALK;
-            }
-        }
-    }
-		if (sensores.nivel == 0) {
-        current_state.fil = sensores.posF;
-        current_state.col = sensores.posC;
-        current_state.brujula = sensores.sentido;
-        mapTerreno(sensores.terreno, mapaResultado);
-        mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
-    } else {
-        if (!bien_situado && usar_mapa) {
-            mapTerreno(sensores.terreno, mapaAuxiliar);
-            mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
-        }
-        if (bien_situado) {
-            mapTerreno(sensores.terreno, mapaAuxiliar);
-            mapTerreno(sensores.terreno, mapaResultado);
-            mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
-        }
-    }
+		cout << "MAPA RESULTADO: " << endl;
+		for (int i = 0; i < tam_mapa; ++i) {
+		for (int j = 0; j < tam_mapa; ++j) {
+			std::cout << mapaResultado[i][j] << " ";
+		}
+		cout << endl;
+		
+		    }
+			*/
+		if (sensores.nivel==0){
+		current_state.fil = sensores.posF;
+		current_state.col = sensores.posC;
+		current_state.brujula = sensores.sentido;
+		mapTerreno(sensores.terreno, mapaResultado);
+		mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
+		cout << mapaTiempos[current_state.fil][current_state.col] << endl;
+		} else {
+	if (!bien_situado && usar_mapa){
+		mapTerreno(sensores.terreno, mapaAuxiliar);		
+	} 
+	if (bien_situado){
+		mapTerreno(sensores.terreno, mapaResultado);
+		mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
+		cout << mapaTiempos[current_state.fil][current_state.col] << endl;
+	
+	}
+	}
+	}
 
+	// Recordar la ultima accion
 	last_action = accion;
+
+/*
+	cout << "MAPA TIEMPOS" << endl;
+		for (int i = 0; i < tam_mapa*2; ++i) {
+        for (int j = 0; j < tam_mapa*2; ++j) {
+            cout << mapaTiempos[i][j] << " ";
+        }
+        cout << endl;
+		    }
+		cout << endl;
+*/
 	return accion;
+	
 }
 
 int ComportamientoJugador::interact(Action accion, int valor)
@@ -155,22 +180,23 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	}
 }
 
-template <typename T>
-void ComportamientoJugador::rotarMapa(vector<vector<T>>& map) {
+void ComportamientoJugador::rotarMapa(vector<vector<unsigned char>>& map) {
     int N = map.size();
-    // Trasponer matriz
+	// Trasponer matriz
     for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; ++j) {
+        for (int j = i+1; j < N; ++j) {
             swap(map[i][j], map[j][i]);
         }
     }
 
-    // Invertir filas
-    for (int i = 0; i < N / 2; i++) {
-        for (int j = 0; j < N; j++) {
-            swap(map[i][j], map[N-i-1][j]);
-        }
-    }
+	// Invertir filas
+	for (int i = 0; i< N/2 ; i++){
+		for (int j = 0; j<N; j++){
+			swap (map[i][j], map[N-i-1][j]);
+		}
+	}
+
+
 }
 void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 	// Calcular la orientación real basada en el cambio de orientación
