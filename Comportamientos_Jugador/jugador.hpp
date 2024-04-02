@@ -25,6 +25,8 @@ class ComportamientoJugador : public Comportamiento{
       last_action = actIDLE;
       bien_situado = false;
       usar_mapa = true;
+      terreno_actual = sensores.terreno[0];
+      terreno_frente = sensores.terreno[2];
 
 
     tam_mapa = size;
@@ -90,6 +92,8 @@ const unsigned char TERRENO_BOSQUE = 'B';
 const unsigned char TERRENO_PRECIPICIO = 'P';
 const unsigned char TERRENO_MURO = 'M';
 const unsigned char TERRENO_AGUA = 'A';
+char terreno_actual;
+char terreno_frente;
 
 
 };

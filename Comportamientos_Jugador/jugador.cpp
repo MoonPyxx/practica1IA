@@ -27,8 +27,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 	}
     if (!acciones_pendientes.empty()) {
         accion = acciones_pendientes.front();
-        if (((accion == actWALK && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO)) ||
-     		(accion == actRUN && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO || 
+        if (((accion == actWALK && (terreno_frente == TERRENO_PRECIPICIO || terreno_frente == TERRENO_MURO)) ||
+     		(accion == actRUN && (terreno_frente == TERRENO_PRECIPICIO || terreno_frente == TERRENO_MURO || 
          	sensores.terreno[6] == TERRENO_PRECIPICIO || sensores.terreno[6] == TERRENO_MURO)))) {
     			accion = actTURN_SR;
 		}
@@ -105,11 +105,10 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	borrarMapaAuxiliar();
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
-	return (sensores.terreno[0] == OBJETO_RECARGA && sensores.bateria < sensores.vida);
+	return (terreno_actual == OBJETO_RECARGA && sensores.bateria < sensores.vida);
 }
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 int ComportamientoJugador::hayObstaculo(Sensores &sensores) {
-    char terreno_frente = sensores.terreno[2];
     char terreno_lejos = sensores.terreno[6];
     bool pocaBateria = sensores.bateria < 3000;
 
@@ -150,7 +149,7 @@ int ComportamientoJugador::hayEntidades(Sensores &sensores){
 }
 
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
-		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == TERRENO_MURO &&
+		if (terreno_actual == 'S' && sensores.terreno[1] == 'S' && terreno_frente == 'S' && sensores.terreno[3] == TERRENO_MURO &&
 		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
 		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
 		sensores.terreno[13] == TERRENO_MURO){
@@ -162,7 +161,7 @@ int ComportamientoJugador::hayEntidades(Sensores &sensores){
 	}
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
-	if (sensores.terreno[0] == 'G' && !bien_situado){
+	if (terreno_actual == 'G' && !bien_situado){
 		int fil = current_state.fil - sensores.posF;
 		int col = current_state.col - sensores.posC;
 		if (usar_mapa){
@@ -232,7 +231,7 @@ void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
-	char terreno_actual = sensores.terreno[0];
+	char terreno_actual = terreno_actual;
 	if (terreno_actual == OBJETO_ZAPATILLAS){
 		tiene_zapatillas = true;
 	} else if(terreno_actual == OBJETO_BIKINI){
@@ -415,7 +414,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
         }
 }
 void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
-	char terreno_actual = sensores.terreno[0];
+	char terreno_actual = terreno_actual;
 	char terreno_objetivo;
 	double mejorTiempo = 1.0;
 	int index = 1;
