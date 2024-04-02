@@ -25,10 +25,6 @@ class ComportamientoJugador : public Comportamiento{
       last_action = actIDLE;
       bien_situado = false;
       usar_mapa = true;
-      terreno_actual = sensores.terreno[0];
-      terreno_frente = sensores.terreno[2];
-
-
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
     mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
@@ -44,7 +40,7 @@ class ComportamientoJugador : public Comportamiento{
     void movimiento(Action accion, Sensores &sensores);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
-    void estaAtrapado(Sensores &sensores);
+   //  void estaAtrapado(Sensores &sensores);
     void detectarPosicionamiento(Sensores &sensores);
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
@@ -80,6 +76,8 @@ class ComportamientoJugador : public Comportamiento{
   vector<vector<unsigned char>> mapaAuxiliar;
   bool usar_mapa;
 
+  bool correr;
+
 
   // mapa de tiempos
   vector<vector<double>> mapaTiempos;
@@ -92,8 +90,6 @@ const unsigned char TERRENO_BOSQUE = 'B';
 const unsigned char TERRENO_PRECIPICIO = 'P';
 const unsigned char TERRENO_MURO = 'M';
 const unsigned char TERRENO_AGUA = 'A';
-char terreno_actual;
-char terreno_frente;
 
 
 };

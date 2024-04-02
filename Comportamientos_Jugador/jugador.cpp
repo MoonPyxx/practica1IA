@@ -9,11 +9,15 @@ Action ComportamientoJugador::think(Sensores sensores)
 	int estadoObstaculo = hayObstaculo(sensores);
 	int estadoEntidades = hayEntidades(sensores);
     añadirObjeto(sensores);
-    estaAtrapado(sensores);
+   // estaAtrapado(sensores);
     detectarObjetos(sensores);
     movimiento(accion, sensores);
     detectarPosicionamiento(sensores);
-
+	      if (sensores.nivel == 3){
+		    correr = false;
+	    } else {
+		    correr = true;
+	    }
     if (sensores.reset) {
         reinicio(sensores);
     }
@@ -27,8 +31,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 	}
     if (!acciones_pendientes.empty()) {
         accion = acciones_pendientes.front();
-        if (((accion == actWALK && (terreno_frente == TERRENO_PRECIPICIO || terreno_frente == TERRENO_MURO)) ||
-     		(accion == actRUN && (terreno_frente == TERRENO_PRECIPICIO || terreno_frente == TERRENO_MURO || 
+        if (((accion == actWALK && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO)) ||
+     		(accion == actRUN && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO || 
          	sensores.terreno[6] == TERRENO_PRECIPICIO || sensores.terreno[6] == TERRENO_MURO)))) {
     			accion = actTURN_SR;
 		}
@@ -50,7 +54,7 @@ Action ComportamientoJugador::think(Sensores sensores)
         			accion = actWALK;
     			}
 				} else if(estadoObstaculo == 0 && estadoObstaculo == 0) {
-    				if(bien_situado){
+    				if(bien_situado && correr){
         				accion = actRUN;
     				} else{
         				accion = actWALK;
@@ -105,16 +109,16 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	borrarMapaAuxiliar();
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
-	return (terreno_actual == OBJETO_RECARGA && sensores.bateria < sensores.vida);
+	return (sensores.terreno[0] == OBJETO_RECARGA && sensores.bateria < sensores.vida);
 }
 // Comprobar si delante hay un obstaculo (muro o precipicio)
 int ComportamientoJugador::hayObstaculo(Sensores &sensores) {
     char terreno_lejos = sensores.terreno[6];
     bool pocaBateria = sensores.bateria < 3000;
 
-    if (terreno_frente == TERRENO_MURO || terreno_frente == TERRENO_PRECIPICIO) {
+    if (sensores.terreno[2] == TERRENO_MURO || sensores.terreno[2] == TERRENO_PRECIPICIO) {
         return 2; // PARA
-    } else if ((terreno_frente == TERRENO_BOSQUE && !tiene_zapatillas) || (terreno_frente == TERRENO_AGUA && !tiene_bikini)) {
+    } else if ((sensores.terreno[2] == TERRENO_BOSQUE && !tiene_zapatillas) || (sensores.terreno[2] == TERRENO_AGUA && !tiene_bikini)) {
         return pocaBateria ? 1 : 2; // Anda si poca batería, para si alta
     } else{ // si puede andar
 			if(terreno_lejos == TERRENO_MURO || terreno_lejos == TERRENO_PRECIPICIO) {
@@ -148,8 +152,8 @@ int ComportamientoJugador::hayEntidades(Sensores &sensores){
     return 0;
 }
 
-	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
-		if (terreno_actual == 'S' && sensores.terreno[1] == 'S' && terreno_frente == 'S' && sensores.terreno[3] == TERRENO_MURO &&
+	/*void ComportamientoJugador::estaAtrapado(Sensores &sensores){
+		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' && sensores.terreno[2] == 'S' && sensores.terreno[3] == TERRENO_MURO &&
 		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
 		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
 		sensores.terreno[13] == TERRENO_MURO){
@@ -159,9 +163,10 @@ int ComportamientoJugador::hayEntidades(Sensores &sensores){
 		acciones_pendientes.push(actWALK);
 		}
 	}
+	*/
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
-	if (terreno_actual == 'G' && !bien_situado){
+	if (sensores.terreno[0] == 'G' && !bien_situado){
 		int fil = current_state.fil - sensores.posF;
 		int col = current_state.col - sensores.posC;
 		if (usar_mapa){
@@ -231,7 +236,7 @@ void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 // Comprobar si delante es transitable o tienes bikini/zapatillas
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
-	char terreno_actual = terreno_actual;
+	char terreno_actual = sensores.terreno[0];
 	if (terreno_actual == OBJETO_ZAPATILLAS){
 		tiene_zapatillas = true;
 	} else if(terreno_actual == OBJETO_BIKINI){
@@ -301,13 +306,13 @@ void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
 	int nivel_bateria = sensores.vida;
-	/*bool muro = false;
+	bool muro = false;
 	for (int i = 0; i<= 15; i++){
 		if (sensores.terreno[i]== TERRENO_MURO){
 			muro = true;
 		}
 	}
-	*/
+	
 	if (acciones_pendientes.empty()){
 		for (int j= 0; j<=15; j++){
 			if ((current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste) && 
@@ -338,83 +343,182 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
                 acciones_pendientes.push(actWALK);
                 break;
 			case 4:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actRUN);
-
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 5:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 6:
+			if (correr){
 				acciones_pendientes.push(actRUN);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 7:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 8:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actRUN);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}	
 				break;
 			case 9:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}		
 				break;
 			case 10:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actRUN);
+			} else{
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
+				
 				break;
 			case 11:
+			if(correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_L);
+				acciones_pendientes.push(actWALK);
+			}
+				
 				break;
 			case 12:
+			if (correr){
 				acciones_pendientes.push(actRUN);
+			} else{
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
 				acciones_pendientes.push(actWALK);
 				break;
 			case 13:
+			if(correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 14:
+			if (correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actRUN);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
 			case 15:
+			if(correr){
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
+			} else {
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actTURN_SR);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actWALK);
+			}
 				break;
-
             default:
                 break;
         }
 }
 void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
-	char terreno_actual = terreno_actual;
+	char terreno_actual = sensores.terreno[0];
 	char terreno_objetivo;
 	double mejorTiempo = 1.0;
 	int index = 1;
