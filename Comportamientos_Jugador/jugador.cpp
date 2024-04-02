@@ -6,7 +6,8 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-
+	int estadoObstaculo = hayObstaculo(sensores);
+	int estadoEntidades = hayEntidades(sensores);
     añadirObjeto(sensores);
     estaAtrapado(sensores);
     detectarObjetos(sensores);
@@ -20,31 +21,45 @@ Action ComportamientoJugador::think(Sensores sensores)
     if (recargar(sensores)) {
         acciones_pendientes.push(actIDLE);
     }
-
+	if (sensores.colision){
+		limpiarCola();
+		accion = actTURN_L;
+	}
     if (!acciones_pendientes.empty()) {
         accion = acciones_pendientes.front();
-        if (accion == actWALK && sensores.terreno[2] == 'P') {
-            accion = actTURN_SR;
-        }
+        if (((accion == actWALK && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO)) ||
+     		(accion == actRUN && (sensores.terreno[2] == TERRENO_PRECIPICIO || sensores.terreno[2] == TERRENO_MURO || 
+         	sensores.terreno[6] == TERRENO_PRECIPICIO || sensores.terreno[6] == TERRENO_MURO)))) {
+    			accion = actTURN_SR;
+		}
         acciones_pendientes.pop();
     } else {
         if (bien_situado) {
             comprobarMapaTiempos(sensores);
         }
-
         if (acciones_pendientes.empty()) {
-            if (hayObstaculo(sensores) || hayEntidades(sensores)) {
-                if (rand() % 2 == 0) {
-                    accion = actTURN_L;
-                } else {
-                    accion = actTURN_SR;
-                }
-            } else {
-                accion = actWALK;
-            }
-        }
+			if (estadoObstaculo >= 1 || estadoEntidades >= 1) {
+    		// Si hay un obstáculo cercano o una entidad que requiere atención inmediata, decide girar.
+    			if (estadoObstaculo == 2 || estadoEntidades == 2) {
+        			if (rand() % 2 == 0) {
+            			accion = actTURN_L;
+        			} else {
+            			accion = actTURN_SR;
+        			}
+    			} else if (estadoObstaculo == 1 ||  estadoEntidades == 1) {
+        			accion = actWALK;
+    			}
+				} else if(estadoObstaculo == 0 && estadoObstaculo == 0) {
+    				if(bien_situado){
+        				accion = actRUN;
+    				} else{
+        				accion = actWALK;
+    				}
+				}
+    	}
     }
 		if (sensores.nivel == 0) {
+		// bien_situado = true;
         current_state.fil = sensores.posF;
         current_state.col = sensores.posC;
         current_state.brujula = sensores.sentido;
@@ -61,7 +76,6 @@ Action ComportamientoJugador::think(Sensores sensores)
             mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
         }
     }
-
 	last_action = accion;
 	return accion;
 }
@@ -102,32 +116,53 @@ bool ComportamientoJugador::recargar(Sensores &sensores){
 	return (sensores.terreno[0] == OBJETO_RECARGA && sensores.bateria < sensores.vida);
 }
 // Comprobar si delante hay un obstaculo (muro o precipicio)
-bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
-	char terreno_frente = sensores.terreno[2];
-	bool pocaBateria = sensores.bateria < 3000;
-		if (terreno_frente == TERRENO_MURO || terreno_frente == TERRENO_PRECIPICIO) {
-    		return true; 
-		} else if ((terreno_frente == TERRENO_BOSQUE && !tiene_zapatillas) || (terreno_frente == TERRENO_AGUA && !tiene_bikini)) {
-    		return !pocaBateria; 
-		} else {
-    		return false; 
+int ComportamientoJugador::hayObstaculo(Sensores &sensores) {
+    char terreno_frente = sensores.terreno[2];
+    char terreno_lejos = sensores.terreno[6];
+    bool pocaBateria = sensores.bateria < 3000;
+
+    if (terreno_frente == TERRENO_MURO || terreno_frente == TERRENO_PRECIPICIO) {
+        return 2; // PARA
+    } else if ((terreno_frente == TERRENO_BOSQUE && !tiene_zapatillas) || (terreno_frente == TERRENO_AGUA && !tiene_bikini)) {
+        return pocaBateria ? 1 : 2; // Anda si poca batería, para si alta
+    } else{ // si puede andar
+			if(terreno_lejos == TERRENO_MURO || terreno_lejos == TERRENO_PRECIPICIO) {
+				return 2;
+			} else if ((terreno_lejos == TERRENO_BOSQUE && !tiene_zapatillas) || 
+        (terreno_lejos == TERRENO_AGUA && !tiene_bikini)) {
+        return 1;
+    }
+	}
+    return 0;
+
+	// 2=  no puede avanzar
+	// 1= puede andar
+	// 0= puede correr
 }
-}
-bool ComportamientoJugador::hayEntidades(Sensores &sensores){
-	for (int i = 1; i <= 3; i++) {
+
+
+int ComportamientoJugador::hayEntidades(Sensores &sensores){
+    for (int i = 1; i <= 3; i++) {
         if (sensores.agentes[i] == 'a' || sensores.agentes[i] == 'l') {
-            return true;
+            return 2; // girar
         }
     }
-    return false;
+
+    // Luego buscamos entidades a una distancia moderada.
+    for (int i = 5; i <= 7; i++) {
+        if (sensores.agentes[i] == 'a' || sensores.agentes[i] == 'l') {
+            return 1; // andar.
+        }
+    }
+    return 0;
 }
+
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
 		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == TERRENO_MURO &&
 		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
 		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
 		sensores.terreno[13] == TERRENO_MURO){
-		acciones_pendientes.push(actWALK); 
-  		acciones_pendientes.push(actWALK); 
+		acciones_pendientes.push(actRUN); 
   		acciones_pendientes.push(actTURN_SR); 
   		acciones_pendientes.push(actTURN_SR); 
 		acciones_pendientes.push(actWALK);
@@ -275,13 +310,14 @@ void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
 	int nivel_bateria = sensores.vida;
-	bool muro = false;
+	/*bool muro = false;
 	for (int i = 0; i<= 15; i++){
 		if (sensores.terreno[i]== TERRENO_MURO){
 			muro = true;
 		}
 	}
-	if (acciones_pendientes.empty() && !muro){
+	*/
+	if (acciones_pendientes.empty()){
 		for (int j= 0; j<=15; j++){
 			if ((current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste) && 
     		((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
@@ -289,6 +325,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
     		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
     		(sensores.terreno[j] == 'G' && !bien_situado))) {
 				accionPorCasilla(j);
+				cout << "detectado objeto en " << j << endl;
 			}
 		}
 	}
@@ -310,91 +347,74 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
                 acciones_pendientes.push(actWALK);
                 break;
 			case 4:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_L);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
+
 				break;
 			case 5:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 6:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				break;
 			case 7:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 8:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				break;
 			case 9:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 10:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				break;
 			case 11:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 12:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 13:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
 				break;
 			case 14:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				break;
 			case 15:
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
-				acciones_pendientes.push(actWALK);
-				acciones_pendientes.push(actWALK);
+				acciones_pendientes.push(actRUN);
 				acciones_pendientes.push(actWALK);
 				break;
 
@@ -409,7 +429,7 @@ void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
 	int index = 1;
 		switch(current_state.brujula){
 		case norte:
-		 index = 1; 
+		/* index = 1; 
 		for(int i = 1; i <= 3; ++i) { 
     		for(int j = -i; j <= i; ++j) { 
 					if(sensores.terreno[index] != '?'){
@@ -424,6 +444,9 @@ void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
 			}
 		break;
 		}
+		*/
+	break;
+}
 }
 
 

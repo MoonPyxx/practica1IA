@@ -38,7 +38,7 @@ class ComportamientoJugador : public Comportamiento{
 
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
-    bool hayObstaculo(Sensores &sensores);
+    int hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
     void movimiento(Action accion, Sensores &sensores);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
@@ -48,7 +48,7 @@ class ComportamientoJugador : public Comportamiento{
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
-    bool hayEntidades(Sensores &sensores);
+    int hayEntidades(Sensores &sensores);
     void limpiarCola();
     void reorientarMapa(Sensores &sensores);
 
