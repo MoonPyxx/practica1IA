@@ -80,14 +80,6 @@ Action ComportamientoJugador::think(Sensores sensores)
 	return accion;
 }
 
-int ComportamientoJugador::interact(Action accion, int valor)
-{
-	return false;
-}
-
-// Funciones mias
-
-// Reiniciar
 void ComportamientoJugador::limpiarCola(){
 	while (!acciones_pendientes.empty()){
 		acciones_pendientes.pop();

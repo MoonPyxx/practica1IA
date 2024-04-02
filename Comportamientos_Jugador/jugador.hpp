@@ -37,7 +37,6 @@ class ComportamientoJugador : public Comportamiento{
     ~ComportamientoJugador(){}
 
     Action think(Sensores sensores);
-    int interact(Action accion, int valor);
     int hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
     void movimiento(Action accion, Sensores &sensores);
