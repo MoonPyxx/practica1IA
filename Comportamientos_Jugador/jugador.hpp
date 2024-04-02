@@ -1,3 +1,4 @@
+
 #ifndef COMPORTAMIENTOJUGADOR_H
 #define COMPORTAMIENTOJUGADOR_H
 
@@ -25,6 +26,8 @@ class ComportamientoJugador : public Comportamiento{
       last_action = actIDLE;
       bien_situado = false;
       usar_mapa = true;
+
+
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
     mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
@@ -35,17 +38,18 @@ class ComportamientoJugador : public Comportamiento{
     ~ComportamientoJugador(){}
 
     Action think(Sensores sensores);
-    int hayObstaculo(Sensores &sensores);
+    int interact(Action accion, int valor);
+    bool hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
     void movimiento(Action accion, Sensores &sensores);
     void mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz);
     void reinicio(Sensores &sensores);
-   //  void estaAtrapado(Sensores &sensores);
+    void estaAtrapado(Sensores &sensores);
     void detectarPosicionamiento(Sensores &sensores);
     bool recargar(Sensores &sensores);
     void actualizarMapaConAuxiliar(int fil, int col);
     void detectarObjetos(Sensores &sensores);
-    int hayEntidades(Sensores &sensores);
+    bool hayEntidades(Sensores &sensores);
     void limpiarCola();
     void reorientarMapa(Sensores &sensores);
 
@@ -75,8 +79,6 @@ class ComportamientoJugador : public Comportamiento{
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
   bool usar_mapa;
-
-  bool correr;
 
 
   // mapa de tiempos
