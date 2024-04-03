@@ -51,7 +51,13 @@ class ComportamientoJugador : public Comportamiento{
     void detectarObjetos(Sensores &sensores);
     bool hayEntidades(Sensores &sensores);
     void limpiarCola();
+
+
+  void rellenarBordes();
+
     void reorientarMapa(Sensores &sensores);
+
+
 
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
