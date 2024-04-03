@@ -51,6 +51,7 @@ class ComportamientoJugador : public Comportamiento{
     void detectarObjetos(Sensores &sensores);
     bool hayEntidades(Sensores &sensores);
     void limpiarCola();
+    void orientarJugador(Sensores &sensores, Orientacion orientacion);
 
 
   void rellenarBordes();
@@ -61,7 +62,7 @@ class ComportamientoJugador : public Comportamiento{
 
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
-    void accionPorCasilla(int casilla);
+    void accionPorCasilla(Sensores &sensores, int casilla);
     void comprobarMapaTiempos(Sensores &sensores);
     void actualizarMapaTiempos(int fil, int col);
     template <typename T>

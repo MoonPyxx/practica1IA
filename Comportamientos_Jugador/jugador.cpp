@@ -40,7 +40,11 @@ Action ComportamientoJugador::think(Sensores sensores)
                     accion = actTURN_SR;
                 }
             } else {
-                accion = actWALK;
+				if (rand () %15 == 0){
+					accion = actTURN_SR;
+				} else {
+					accion = actWALK;
+				}
             }
         }
     }
@@ -297,29 +301,58 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
 	int nivel_bateria = sensores.vida;
 	bool muro = false;
-	for (int i = 0; i<= 15; i++){
+	Orientacion direccion = current_state.brujula;
+	bool doble_direccion = current_state.brujula == noreste || current_state.brujula == sureste || current_state.brujula == suroeste || current_state.brujula == noroeste;
+	for (int i = 0; i<= casillas_sensor; i++){
 		if (sensores.terreno[i]== TERRENO_MURO){
 			muro = true;
 		}
 	}
 	if (acciones_pendientes.empty() && !muro){
-		for (int j= 0; j<=15; j++){
+		for (int j= 0; j<=casillas_sensor; j++){
 			if (((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
     		(sensores.terreno[j] == OBJETO_BIKINI && !tiene_bikini) || 
     		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
     		(sensores.terreno[j] == 'G' && !bien_situado))) {
+				if (doble_direccion){
+					cout << "!Doble direccion!" << endl;
+				//	acciones_pendientes.push(actTURN_SR);
+				accionPorCasilla(sensores, j);
+
+				} else{
+					accionPorCasilla(sensores, j);
+				}
 				cout << "Orientacion actual" << current_state.brujula << endl;
 				cout << "Detectado objeto en casilla " << j << endl;
-				accionPorCasilla(j);
+				
+
 			}
 		}
 	}
 }
-void ComportamientoJugador::accionPorCasilla(int casilla){
-	bool doble_direccion = current_state.brujula == noreste || current_state.brujula == sureste || current_state.brujula == suroeste || current_state.brujula == noroeste;
+void ComportamientoJugador::orientarJugador(Sensores &sensores, Orientacion orientacion){
+	switch (orientacion){
+		case noreste:
+		acciones_pendientes.push(actTURN_SR);
+		acciones_pendientes.push(actTURN_L);
+		break;
+		case sureste:
+		acciones_pendientes.push(actTURN_SR);
+		acciones_pendientes.push(actTURN_L);
+		break;
+		case noroeste:
+		acciones_pendientes.push(actTURN_SR);
+		break;
+		case suroeste:
+		acciones_pendientes.push(actTURN_SR);
+		break;
+	}
+}
+void ComportamientoJugador::accionPorCasilla(Sensores &sensores, int casilla){
 	switch (casilla) {
             case 1:
                 acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
                 acciones_pendientes.push(actTURN_L);
                 acciones_pendientes.push(actWALK);
                 break;
@@ -328,6 +361,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
                 break;
             case 3:
                 acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
                 acciones_pendientes.push(actTURN_SR);
                 acciones_pendientes.push(actTURN_SR);
                 acciones_pendientes.push(actWALK);
@@ -335,6 +369,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 			case 4:
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
@@ -342,6 +377,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 			case 5:
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				break;
@@ -352,6 +388,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 			case 7:
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
@@ -359,6 +396,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 			case 8:
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
@@ -368,6 +406,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
@@ -377,6 +416,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
@@ -385,6 +425,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_L);
 				acciones_pendientes.push(actWALK);
 				break;
@@ -397,6 +438,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
@@ -405,6 +447,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
@@ -414,6 +457,7 @@ void ComportamientoJugador::accionPorCasilla(int casilla){
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
 				acciones_pendientes.push(actWALK);
+				orientarJugador(sensores, current_state.brujula);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actTURN_SR);
 				acciones_pendientes.push(actWALK);
