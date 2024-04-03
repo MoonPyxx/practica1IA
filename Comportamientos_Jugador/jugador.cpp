@@ -45,6 +45,7 @@ Action ComportamientoJugador::think(Sensores sensores)
         }
     }
 		if (sensores.nivel == 0) {
+		bien_situado = true;
         current_state.fil = sensores.posF;
         current_state.col = sensores.posC;
         current_state.brujula = sensores.sentido;
@@ -303,17 +304,19 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	}
 	if (acciones_pendientes.empty() && !muro){
 		for (int j= 0; j<=15; j++){
-			if ((current_state.brujula == norte || current_state.brujula == sur || current_state.brujula == este || current_state.brujula == oeste) && 
-    		((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
+			if (((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
     		(sensores.terreno[j] == OBJETO_BIKINI && !tiene_bikini) || 
     		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
     		(sensores.terreno[j] == 'G' && !bien_situado))) {
+				cout << "Orientacion actual" << current_state.brujula << endl;
+				cout << "Detectado objeto en casilla " << j << endl;
 				accionPorCasilla(j);
 			}
 		}
 	}
 }
 void ComportamientoJugador::accionPorCasilla(int casilla){
+	bool doble_direccion = current_state.brujula == noreste || current_state.brujula == sureste || current_state.brujula == suroeste || current_state.brujula == noroeste;
 	switch (casilla) {
             case 1:
                 acciones_pendientes.push(actWALK);
