@@ -6,7 +6,7 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	rellenarBordes();
+	// rellenarBordes();
     añadirObjeto(sensores);
     estaAtrapado(sensores);
     detectarObjetos(sensores);
@@ -76,7 +76,7 @@ int ComportamientoJugador::interact(Action accion, int valor)
 	return false;
 }
 
-void ComportamientoJugador::rellenarBordes(){
+/*void ComportamientoJugador::rellenarBordes(){
 	for(int i = 0; i < 3; i++) { 
         for(int j = 0; j < tam_mapa; j++) {
             mapaResultado[i][j] = TERRENO_PRECIPICIO;
@@ -98,6 +98,7 @@ void ComportamientoJugador::rellenarBordes(){
         }
     }
 }
+*/
 
 void ComportamientoJugador::limpiarCola(){
 	while (!acciones_pendientes.empty()){

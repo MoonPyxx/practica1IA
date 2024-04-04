@@ -26,11 +26,33 @@ class ComportamientoJugador : public Comportamiento{
       last_action = actIDLE;
       bien_situado = false;
       usar_mapa = true;
-
-
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
     mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
+
+
+
+    // Rellenar bordes del mapa
+    for(int i = 0; i < 3; i++) { 
+        for(int j = 0; j < size; j++) {
+            mapaResultado[i][j] = TERRENO_PRECIPICIO;
+        }	
+    }
+	 for(int j = 0; j < 3; j++) { 
+        for(int i = 0; i < size; i++) {
+            mapaResultado[i][j] = TERRENO_PRECIPICIO;
+        }
+	 }
+	 for(int i = size - 3; i < size; i++) { 
+        for(int j = 0; j < size; j++) {
+            mapaResultado[i][j] = TERRENO_PRECIPICIO;
+        }
+    }
+	 for(int j = size - 3; j < size; j++) {
+        for(int i = 0; i < size; i++) {
+            mapaResultado[i][j] = TERRENO_PRECIPICIO;
+        }
+    }
 
     }
 
@@ -54,7 +76,7 @@ class ComportamientoJugador : public Comportamiento{
     void orientarJugador(Sensores &sensores, Orientacion orientacion);
 
 
-  void rellenarBordes();
+ // void rellenarBordes();
 
     void reorientarMapa(Sensores &sensores);
 
