@@ -6,7 +6,6 @@ using namespace std;
 Action ComportamientoJugador::think(Sensores sensores)
 {	
 	Action accion = actIDLE;
-	// rellenarBordes();
     añadirObjeto(sensores);
     estaAtrapado(sensores);
     detectarObjetos(sensores);
@@ -56,7 +55,7 @@ Action ComportamientoJugador::think(Sensores sensores)
         mapTerreno(sensores.terreno, mapaResultado);
         mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
     } else {
-        if (!bien_situado && usar_mapa) {
+        if (!bien_situado) {
             mapTerreno(sensores.terreno, mapaAuxiliar);
             mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
         }
@@ -70,35 +69,6 @@ Action ComportamientoJugador::think(Sensores sensores)
 	last_action = accion;
 	return accion;
 }
-
-int ComportamientoJugador::interact(Action accion, int valor)
-{
-	return false;
-}
-
-/*void ComportamientoJugador::rellenarBordes(){
-	for(int i = 0; i < 3; i++) { 
-        for(int j = 0; j < tam_mapa; j++) {
-            mapaResultado[i][j] = TERRENO_PRECIPICIO;
-        }	
-    }
-	 for(int j = 0; j < 3; j++) { 
-        for(int i = 0; i < tam_mapa; i++) {
-            mapaResultado[i][j] = TERRENO_PRECIPICIO;
-        }
-	 }
-	 for(int i = tam_mapa - 3; i < tam_mapa; i++) { 
-        for(int j = 0; j < tam_mapa; j++) {
-            mapaResultado[i][j] = TERRENO_PRECIPICIO;
-        }
-    }
-	 for(int j = tam_mapa - 3; j < tam_mapa; j++) {
-        for(int i = 0; i < tam_mapa; i++) {
-            mapaResultado[i][j] = TERRENO_PRECIPICIO;
-        }
-    }
-}
-*/
 
 void ComportamientoJugador::limpiarCola(){
 	while (!acciones_pendientes.empty()){
@@ -121,7 +91,6 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 	tiene_bikini = tiene_zapatillas = false;
 	last_action = actIDLE;
 	limpiarCola();
-	if (usar_mapa)
 	borrarMapaAuxiliar();
 }
 bool ComportamientoJugador::recargar(Sensores &sensores){
@@ -164,13 +133,12 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G' && !bien_situado){
 		int fil = current_state.fil - sensores.posF;
 		int col = current_state.col - sensores.posC;
-		if (usar_mapa){
 			if (sensores.nivel == 3)
-		{
-			reorientarMapa(sensores);
-		}
+			{
+				reorientarMapa(sensores);
+			}
 		actualizarMapaConAuxiliar(fil, col);
-		}
+
 		
 		current_state.fil = sensores.posF;
 		current_state.col = sensores.posC;
@@ -255,7 +223,6 @@ void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
 bool ComportamientoJugador::dentroDeMapa(int fil, int col, int filasMax, int columnasMax){
 	return (fil >= 0 && fil < filasMax && col >= 0 && col < columnasMax);
 }
-// Calcular movimiento (actWALK, actRUN)
 void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 
 	if (!sensores.colision){
@@ -285,7 +252,7 @@ void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 				case noroeste: current_state.fil-=2; current_state.col-=2; break;
 		   }
 		   break;
- 		// Actualizacion en caso de correr (45 grados)
+ 		// Actualizacion en caso de girar a la derecha (45 grados)
 		case actTURN_SR:
 			a = (a+1)%8;
 			current_state.brujula = static_cast<Orientacion>(a);

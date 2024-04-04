@@ -25,7 +25,7 @@ class ComportamientoJugador : public Comportamiento{
       tiene_zapatillas = false;
       last_action = actIDLE;
       bien_situado = false;
-      usar_mapa = true;
+      puede_correr = false;
     tam_mapa = size;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
     mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
@@ -60,7 +60,6 @@ class ComportamientoJugador : public Comportamiento{
     ~ComportamientoJugador(){}
 
     Action think(Sensores sensores);
-    int interact(Action accion, int valor);
     bool hayObstaculo(Sensores &sensores);
     void añadirObjeto(Sensores &sensores);
     void movimiento(Action accion, Sensores &sensores);
@@ -74,10 +73,6 @@ class ComportamientoJugador : public Comportamiento{
     bool hayEntidades(Sensores &sensores);
     void limpiarCola();
     void orientarJugador(Sensores &sensores, Orientacion orientacion);
-
-
- // void rellenarBordes();
-
     void reorientarMapa(Sensores &sensores);
 
 
@@ -101,15 +96,14 @@ class ComportamientoJugador : public Comportamiento{
   int tam_mapa;
   queue<Action> acciones_pendientes;
 
+  bool puede_correr;
+
   // variables objetos
   bool tiene_bikini;
   bool tiene_zapatillas;
 
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
-  bool usar_mapa;
-
-
   // mapa de tiempos
   vector<vector<double>> mapaTiempos;
 
