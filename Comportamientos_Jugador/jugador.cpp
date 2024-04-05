@@ -124,16 +124,19 @@ bool ComportamientoJugador::hayEntidades(Sensores &sensores){
     return false;
 }
 	void ComportamientoJugador::estaAtrapado(Sensores &sensores){
-		if (sensores.terreno[0] == 'S' && sensores.terreno[1] == 'S' &&sensores.terreno[2] == 'S' && sensores.terreno[3] == TERRENO_MURO &&
-		sensores.terreno[5] == 'S' && sensores.terreno[6] == 'S' && 
-		sensores.terreno[7] == 'S' && sensores.terreno[11] == 'S' && sensores.terreno[12] == 'S' &&
-		sensores.terreno[13] == TERRENO_MURO){
-		acciones_pendientes.push(actWALK); 
-  		acciones_pendientes.push(actWALK); 
-  		acciones_pendientes.push(actTURN_SR); 
-  		acciones_pendientes.push(actTURN_SR); 
-		acciones_pendientes.push(actWALK);
-		}
+	if (sensores.terreno[0] != TERRENO_MURO && 
+    sensores.terreno[2] != TERRENO_MURO && 
+    sensores.terreno[3] == TERRENO_MURO && 
+    sensores.terreno[6] != TERRENO_MURO && 
+    sensores.terreno[7] != TERRENO_MURO && 
+	sensores.terreno[8] != TERRENO_MURO &&
+    sensores.terreno[13] == TERRENO_MURO){ 
+	acciones_pendientes.push(actWALK); 
+  	acciones_pendientes.push(actWALK); 
+  	acciones_pendientes.push(actTURN_SR); 
+  	acciones_pendientes.push(actTURN_SR); 
+	acciones_pendientes.push(actWALK);
+} 
 	}
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
