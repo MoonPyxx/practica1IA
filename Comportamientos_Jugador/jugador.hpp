@@ -25,12 +25,9 @@ class ComportamientoJugador : public Comportamiento{
       tiene_zapatillas = false;
       last_action = actIDLE;
       bien_situado = false;
-      puede_correr = false;
-    tam_mapa = size;
+      tam_mapa = size;
+      num_giros = 0;
     mapaAuxiliar = vector<vector<unsigned char>>(size *2, vector<unsigned char>(size*2, '?'));
-    mapaTiempos = vector<vector<double>>(size *2, vector<double>(size*2, 0));
-
-
 
     // Rellenar bordes del mapa
     for(int i = 0; i < 3; i++) { 
@@ -75,13 +72,11 @@ class ComportamientoJugador : public Comportamiento{
     void orientarJugador(Sensores &sensores, Orientacion orientacion);
     void reorientarMapa(Sensores &sensores);
 
-
+    bool puedeCorrer(Sensores &sensores);
 
     void borrarMapaAuxiliar();
     bool dentroDeMapa(int fil, int col, int filasMax, int columnasMax);
     void accionPorCasilla(Sensores &sensores, int casilla);
-    void comprobarMapaTiempos(Sensores &sensores);
-    void actualizarMapaTiempos(int fil, int col);
     template <typename T>
     void rotarMapa(vector<vector<T>>& map);
 
@@ -95,8 +90,7 @@ class ComportamientoJugador : public Comportamiento{
   bool bien_situado;
   int tam_mapa;
   queue<Action> acciones_pendientes;
-
-  bool puede_correr;
+  int num_giros;
 
   // variables objetos
   bool tiene_bikini;
@@ -104,10 +98,7 @@ class ComportamientoJugador : public Comportamiento{
 
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
-  // mapa de tiempos
-  vector<vector<double>> mapaTiempos;
-
-
+  
 const unsigned char OBJETO_BIKINI = 'K';
 const unsigned char OBJETO_ZAPATILLAS = 'D';
 const unsigned char OBJETO_RECARGA = 'X';

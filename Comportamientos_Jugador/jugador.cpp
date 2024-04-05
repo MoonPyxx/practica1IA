@@ -25,12 +25,9 @@ Action ComportamientoJugador::think(Sensores sensores)
         if (accion == actWALK && sensores.terreno[2] == 'P') {
             accion = actTURN_SR;
         }
+		
         acciones_pendientes.pop();
     } else {
-        if (bien_situado) {
-            comprobarMapaTiempos(sensores);
-        }
-
         if (acciones_pendientes.empty()) {
             if (hayObstaculo(sensores) || hayEntidades(sensores)) {
                 if (rand() % 2 == 0) {
@@ -42,30 +39,26 @@ Action ComportamientoJugador::think(Sensores sensores)
 				if (rand () %15 == 0){
 					accion = actTURN_SR;
 				} else {
-					accion = actWALK;
+						accion = actWALK;
+					}	
 				}
             }
         }
-    }
 		if (sensores.nivel == 0) {
 		bien_situado = true;
         current_state.fil = sensores.posF;
         current_state.col = sensores.posC;
         current_state.brujula = sensores.sentido;
         mapTerreno(sensores.terreno, mapaResultado);
-        mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
     } else {
         if (!bien_situado) {
             mapTerreno(sensores.terreno, mapaAuxiliar);
-            mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
         }
         if (bien_situado) {
             mapTerreno(sensores.terreno, mapaAuxiliar);
             mapTerreno(sensores.terreno, mapaResultado);
-            mapaTiempos[current_state.fil][current_state.col] = sensores.tiempo;
         }
     }
-
 	last_action = accion;
 	return accion;
 }
@@ -81,6 +74,16 @@ void ComportamientoJugador::borrarMapaAuxiliar(){
 			mapaAuxiliar[i][j] = '?';
 		}
 	}
+}
+
+bool ComportamientoJugador::puedeCorrer(Sensores &sensores){
+    if (sensores.terreno[6] == TERRENO_MURO || sensores.terreno[6] == TERRENO_PRECIPICIO ||
+        (sensores.terreno[6] == TERRENO_BOSQUE && !tiene_zapatillas) ||
+        (sensores.terreno[6] == TERRENO_AGUA && !tiene_bikini) ||
+        sensores.agentes[6] == 'a' || sensores.agentes[6] == 'l') {
+        return false;
+    }
+    return true;
 }
 
 void ComportamientoJugador::reinicio(Sensores &sensores){
@@ -269,8 +272,6 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
 	int nivel_bateria = sensores.vida;
 	bool muro = false;
-	Orientacion direccion = current_state.brujula;
-	bool doble_direccion = current_state.brujula == noreste || current_state.brujula == sureste || current_state.brujula == suroeste || current_state.brujula == noroeste;
 	for (int i = 0; i<= casillas_sensor; i++){
 		if (sensores.terreno[i]== TERRENO_MURO){
 			muro = true;
@@ -282,18 +283,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
     		(sensores.terreno[j] == OBJETO_BIKINI && !tiene_bikini) || 
     		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
     		(sensores.terreno[j] == 'G' && !bien_situado))) {
-				if (doble_direccion){
-					cout << "!Doble direccion!" << endl;
-				//	acciones_pendientes.push(actTURN_SR);
 				accionPorCasilla(sensores, j);
-
-				} else{
-					accionPorCasilla(sensores, j);
-				}
-				cout << "Orientacion actual" << current_state.brujula << endl;
-				cout << "Detectado objeto en casilla " << j << endl;
-				
-
 			}
 		}
 	}
@@ -437,32 +427,9 @@ void ComportamientoJugador::accionPorCasilla(Sensores &sensores, int casilla){
                 break;
         }
 }
-void ComportamientoJugador::comprobarMapaTiempos(Sensores &sensores){
-	char terreno_actual = sensores.terreno[0];
-	char terreno_objetivo;
-	double mejorTiempo = 1.0;
-	int index = 1;
-		switch(current_state.brujula){
-		case norte:
-		 index = 1; 
-		for(int i = 1; i <= 3; ++i) { 
-    		for(int j = -i; j <= i; ++j) { 
-					if(sensores.terreno[index] != '?'){
-						if (mapaTiempos[current_state.fil-i][current_state.col+j] < mejorTiempo){
-							mejorTiempo = mapaTiempos[current_state.fil-i][current_state.col+j];
-							terreno_objetivo = sensores.terreno[index++];
-						} else{
-							index++;
-						}
-					}
-				} 
-			}
-		break;
-		}
-}
 
 
-// Mapear el terreno en maparesultado (a medias)
+
 void ComportamientoJugador::mapTerreno(const vector<unsigned char> &terreno, vector < vector < unsigned char > > &matriz){
 	matriz[current_state.fil][current_state.col] = terreno[0];
 	int index = 1;
