@@ -11,7 +11,9 @@ Action ComportamientoJugador::think(Sensores sensores)
     detectarObjetos(sensores);
     movimiento(accion, sensores);
     detectarPosicionamiento(sensores);
-
+	if(sensores.colision){
+		cout << "colision" << endl;
+	}
     if (sensores.reset) {
         reinicio(sensores);
     }
@@ -21,13 +23,14 @@ Action ComportamientoJugador::think(Sensores sensores)
     }
 
     if (!acciones_pendientes.empty()) {
-        accion = acciones_pendientes.front();
-        if (accion == actWALK && sensores.terreno[2] == 'P') {
-            accion = actTURN_SR;
-        }
-		
-        acciones_pendientes.pop();
-    } else {
+		if (hayObstaculo(sensores) && acciones_pendientes.front()== actWALK){
+			accion = actTURN_L;
+		} else{
+			accion = acciones_pendientes.front();
+		}
+			acciones_pendientes.pop();
+	}
+     else {
         if (acciones_pendientes.empty()) {
             if (hayObstaculo(sensores) || hayEntidades(sensores)) {
                 if (rand() % 2 == 0) {
@@ -59,6 +62,7 @@ Action ComportamientoJugador::think(Sensores sensores)
             mapTerreno(sensores.terreno, mapaResultado);
         }
     }
+
 	last_action = accion;
 	return accion;
 }
@@ -99,7 +103,7 @@ void ComportamientoJugador::reinicio(Sensores &sensores){
 bool ComportamientoJugador::recargar(Sensores &sensores){
 	return (sensores.terreno[0] == OBJETO_RECARGA && sensores.bateria < sensores.vida);
 }
-// Comprobar si delante hay un obstaculo (muro o precipicio)
+
 bool ComportamientoJugador::hayObstaculo(Sensores &sensores){
 	char terreno_frente = sensores.terreno[2];
 	bool pocaBateria = sensores.bateria < 3000;
