@@ -136,8 +136,8 @@ bool ComportamientoJugador::hayEntidades(Sensores &sensores){
   	acciones_pendientes.push(actTURN_SR); 
   	acciones_pendientes.push(actTURN_SR); 
 	acciones_pendientes.push(actWALK);
-} 
-	}
+	} 
+}
 
 void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 	if (sensores.terreno[0] == 'G' && !bien_situado){
@@ -277,7 +277,7 @@ void ComportamientoJugador::movimiento(Action accion, Sensores &sensores){
 }
 void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	int casillas_sensor = 15;
-	int nivel_bateria = sensores.vida;
+	int tiempo_restante = sensores.vida;
 	bool muro = false;
 	for (int i = 0; i<= casillas_sensor; i++){
 		if (sensores.terreno[i]== TERRENO_MURO){
@@ -286,7 +286,7 @@ void ComportamientoJugador::detectarObjetos(Sensores &sensores){
 	}
 	if (acciones_pendientes.empty() && !muro){
 		for (int j= 0; j<=casillas_sensor; j++){
-			if (((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < nivel_bateria) || 
+			if (((sensores.terreno[j] == OBJETO_RECARGA && sensores.bateria < tiempo_restante) || 
     		(sensores.terreno[j] == OBJETO_BIKINI && !tiene_bikini) || 
     		(sensores.terreno[j] == OBJETO_ZAPATILLAS && !tiene_zapatillas) || 
     		(sensores.terreno[j] == 'G' && !bien_situado))) {

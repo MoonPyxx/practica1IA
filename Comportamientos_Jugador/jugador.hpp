@@ -71,7 +71,6 @@ class ComportamientoJugador : public Comportamiento{
     void limpiarCola();
     void orientarJugador(Sensores &sensores, Orientacion orientacion);
     void reorientarMapa(Sensores &sensores);
-
     bool puedeCorrer(Sensores &sensores);
 
     void borrarMapaAuxiliar();
