@@ -98,6 +98,7 @@ class ComportamientoJugador : public Comportamiento{
   // mapa
   vector<vector<unsigned char>> mapaAuxiliar;
   
+  // constantes chars
 const unsigned char OBJETO_BIKINI = 'K';
 const unsigned char OBJETO_ZAPATILLAS = 'D';
 const unsigned char OBJETO_RECARGA = 'X';

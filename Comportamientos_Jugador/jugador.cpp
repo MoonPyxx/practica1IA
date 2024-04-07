@@ -11,9 +11,6 @@ Action ComportamientoJugador::think(Sensores sensores)
     detectarObjetos(sensores);
     movimiento(accion, sensores);
     detectarPosicionamiento(sensores);
-	if(sensores.colision){
-		cout << "colision" << endl;
-	}
     if (sensores.reset) {
         reinicio(sensores);
     }
@@ -91,7 +88,6 @@ bool ComportamientoJugador::puedeCorrer(Sensores &sensores){
 }
 
 void ComportamientoJugador::reinicio(Sensores &sensores){
-	cout << "Se ha producido un reinicio " << endl;
 	current_state.fil =  current_state.col = tam_mapa;
 	current_state.brujula = norte;
 	bien_situado = false;
@@ -162,14 +158,12 @@ void ComportamientoJugador::detectarPosicionamiento(Sensores &sensores){
 template <typename T>
 void ComportamientoJugador::rotarMapa(vector<vector<T>>& map) {
     int N = map.size();
-    // Trasponer matriz
     for (int i = 0; i < N; i++) {
         for (int j = i + 1; j < N; ++j) {
             swap(map[i][j], map[j][i]);
         }
     }
 
-    // Invertir filas
     for (int i = 0; i < N / 2; i++) {
         for (int j = 0; j < N; j++) {
             swap(map[i][j], map[N-i-1][j]);
@@ -177,10 +171,7 @@ void ComportamientoJugador::rotarMapa(vector<vector<T>>& map) {
     }
 }
 void ComportamientoJugador::reorientarMapa(Sensores &sensores){
-	// Calcular la orientación real basada en el cambio de orientación
 	int deltaOrientacion = (current_state.brujula - sensores.sentido + 8 ) % 4;
-
-	cout << "Delta orientacion: " << deltaOrientacion << endl;
 	Orientacion orientacionReal = static_cast<Orientacion>(deltaOrientacion);
 
 
@@ -193,11 +184,9 @@ void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 			rotarMapa(mapaAuxiliar);
 			break;
 		case este:	
-		cout << "Este" << endl;
 			rotarMapa(mapaAuxiliar);
 			rotarMapa(mapaAuxiliar);
 			rotarMapa(mapaAuxiliar);
-			cout << "Rotado al este" << endl;
 			break;
 
 			default:
@@ -206,7 +195,6 @@ void ComportamientoJugador::reorientarMapa(Sensores &sensores){
 	
 }
 
-// Comprobar si delante es transitable o tienes bikini/zapatillas
 
 void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 	char terreno_actual = sensores.terreno[0];
@@ -219,7 +207,6 @@ void ComportamientoJugador::añadirObjeto(Sensores &sensores){
 
 
 void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
-
 	 for (int i = 0; i < mapaResultado.size(); i++) {
         for (int j = 0; j < mapaResultado.size(); j++) {
 			if (mapaResultado[i][j] == '?' && dentroDeMapa(fil+i, col+j, tam_mapa*2, tam_mapa*2)){
@@ -228,8 +215,8 @@ void ComportamientoJugador::actualizarMapaConAuxiliar(int fil, int col){
         }
     }
 	borrarMapaAuxiliar();
-	
 }
+
 bool ComportamientoJugador::dentroDeMapa(int fil, int col, int filasMax, int columnasMax){
 	return (fil >= 0 && fil < filasMax && col >= 0 && col < columnasMax);
 }
